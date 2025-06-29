@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 APP_DIR = ROOT / 'app'
 OUTPUT_DIR = ROOT / 'compiled_output'
 CONVERTED_OUTPUT_DIR = ROOT / 'converted_output'
+ZIP_OUTPUT_DIR = ROOT / 'zip_output'
 PROJECTS_DIR = ROOT / 'project_folders'
 
 
@@ -71,6 +72,7 @@ async def api(
     final_path = convert(
         file_path=pdf_path,
         output_folder=CONVERTED_OUTPUT_DIR / hash,
+        zip_folder=ZIP_OUTPUT,
         format=format,
         image_format=format_image,
         dpi=dpi
