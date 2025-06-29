@@ -11,7 +11,7 @@ from datetime import datetime
 ROOT = Path(__file__).resolve().parent.parent
 
 APP_DIR = ROOT / 'app'
-OUTPUT_DIR = ROOT / 'output'
+OUTPUT_DIR = ROOT / 'compile_output'
 CONVERTED_OUTPUT_DIR = ROOT / 'converted_output'
 PROJECTS_DIR = ROOT / 'project_folders'
 

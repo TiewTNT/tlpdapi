@@ -44,8 +44,8 @@ def convert(file_path, output_folder, format='pdf', image_format='png', dpi=200)
     else:
         raise ValueError(f"Unsupported format: {format}")
 
-    if len(list(output_folder.iterdir())) == 1:
+    if len(list(output_folder.glob('*'))) == 1:
         return Path(str(output_folder / file_path.stem) + '.' + format)
 
-    shutil.make_archive(str(output_folder / file_path.stem), 'zip', root_dir=output_folder)
-    return output_folder / (file_path.stem + '.zip')
+    shutil.make_archive(str(output_folder.parent / 'zip_output' / file_path.stem), 'zip', root_dir=output_folder)
+    return Path(str(output_folder.parent / 'zip_output' / file_path.stem) + '.zip')
