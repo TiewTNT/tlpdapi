@@ -6,11 +6,13 @@ from pathlib import Path
 import os
 import shutil
 from compile import compile
+from convert import convert
 from datetime import datetime
 ROOT = Path(__file__).resolve().parent.parent
 
 APP_DIR = ROOT / 'app'
 OUTPUT_DIR = ROOT / 'output'
+CONVERTED_OUTPUT_DIR = ROOT / 'converted_output'
 PROJECTS_DIR = ROOT / 'project_folders'
 
 
@@ -45,12 +47,19 @@ async def api(
     if len(files) == 1 and Path(files[0].filename).suffix == '.zip':
         shutil.unpack_archive(PROJECTS_DIR / hash / files[0].filename, PROJECTS_DIR / hash)
 
-    compile(
+    pdf_path = compile(
         file_folder=PROJECTS_DIR / hash,
         output_folder=OUTPUT_DIR / hash,
         engine=engine,
         tools=tools,
         compiles=int(compiles)
+    )
+    final_path = convert(
+        file_path=pdf_path,
+        output_folder=CONVERTED_OUTPUT_DIR / hash,
+        format=format,
+        image_format=format_image,
+        dpi=dpi
     )
 
     # background_tasks.add_task(cleanup, hash)
