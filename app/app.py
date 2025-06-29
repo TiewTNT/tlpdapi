@@ -6,6 +6,7 @@ from pathlib import Path
 import os
 import shutil
 from compile import compile
+from datetime import datetime
 ROOT = Path(__file__).resolve().parent.parent
 
 APP_DIR = ROOT / 'app'
@@ -24,14 +25,15 @@ def cleanup(hash):
 async def api(
     background_tasks: BackgroundTasks,
     files: List[UploadFile] = File(),
-    engine: str = Form('engine'),
-    format: str = Form('format'),
-    tools: List[str] = Form('tools'),
-    compiles: int = Form('compiles'),
-    time: str = Form('time'),
+    engine: str = Form('pdflatex'),
+    format: str = Form('pdf'),
+    format_image: str = Form('png'),
+    dpi: int = Form(200),
+    tools: List[str] = Form([]),
+    compiles: int = Form(3),
 ):
     
-    hash = str(hashlib.sha256(time.encode()).hexdigest())
+    hash = str(hashlib.sha256(datetime.utcnow().isoformat().encode()).hexdigest())
     os.makedirs(PROJECTS_DIR / hash, exist_ok=True)
     os.makedirs(OUTPUT_DIR / hash, exist_ok=True)
 

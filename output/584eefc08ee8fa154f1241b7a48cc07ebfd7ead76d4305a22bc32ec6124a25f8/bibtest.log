@@ -1,0 +1,94 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.6.16)  29 JUN 2025 18:14
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**"C:/Users/tntti/Dropbox/Tiew Python/tlpdapi/project_folders/584eefc08ee8fa154
+f1241b7a48cc07ebfd7ead76d4305a22bc32ec6124a25f8/bibtest.tex"
+
+(c:/Users/tntti/Dropbox/Tiew Python/tlpdapi/project_folders/584eefc08ee8fa154f1
+241b7a48cc07ebfd7ead76d4305a22bc32ec6124a25f8/bibtest.tex
+LaTeX2e <2025-06-01> patch level 1
+L3 programming layer <2025-05-26>
+(c:/texlive/2025/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
+(c:/texlive/2025/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2025/01/22 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count275
+\c@section=\count276
+\c@subsection=\count277
+\c@subsubsection=\count278
+\c@paragraph=\count279
+\c@subparagraph=\count280
+\c@figure=\count281
+\c@table=\count282
+\abovecaptionskip=\skip49
+\belowcaptionskip=\skip50
+\bibindent=\dimen148
+)
+(c:/texlive/2025/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2024/02/08 v1.3d Input encoding file
+\inpenc@prehook=\toks17
+\inpenc@posthook=\toks18
+)
+(c:/texlive/2025/texmf-dist/tex/latex/cite/cite.sty
+LaTeX Info: Redefining \cite on input line 302.
+LaTeX Info: Redefining \nocite on input line 332.
+Package: cite 2015/02/27  v 5.5
+)
+(c:/texlive/2025/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2025-04-14 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count283
+)
+(C:\Users\tntti\Dropbox\Tiew Python\tlpdapi\output\584eefc08ee8fa154f1241b7a48c
+c07ebfd7ead76d4305a22bc32ec6124a25f8/bibtest.aux)
+\openout1 = `bibtest.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 5.
+LaTeX Font Info:    ... okay on input line 5.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 5.
+LaTeX Font Info:    ... okay on input line 5.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 5.
+LaTeX Font Info:    ... okay on input line 5.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 5.
+LaTeX Font Info:    ... okay on input line 5.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 5.
+LaTeX Font Info:    ... okay on input line 5.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 5.
+LaTeX Font Info:    ... okay on input line 5.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 5.
+LaTeX Font Info:    ... okay on input line 5.
+
+(C:\Users\tntti\Dropbox\Tiew Python\tlpdapi\output\584eefc08ee8fa154f1241b7a48c
+c07ebfd7ead76d4305a22bc32ec6124a25f8/bibtest.bbl)
+
+[1
+
+{c:/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+(C:\Users\tntti\Dropbox\Tiew Python\tlpdapi\output\584eefc08ee8fa154f1241b7a48c
+c07ebfd7ead76d4305a22bc32ec6124a25f8/bibtest.aux)
+ ***********
+LaTeX2e <2025-06-01> patch level 1
+L3 programming layer <2025-05-26>
+ ***********
+ ) 
+Here is how much of TeX's memory you used:
+ 577 strings out of 467886
+ 11814 string characters out of 5438218
+ 426021 words of memory out of 5000000
+ 29199 multiletter control sequences out of 15000+600000
+ 627776 words of font info for 43 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 38i,5n,38p,279b,149s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/tex
+live/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2025/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb>
+Output written on "C:\Users\tntti\Dropbox\Tiew Python\tlpdapi\output\584eefc08e
+e8fa154f1241b7a48cc07ebfd7ead76d4305a22bc32ec6124a25f8/bibtest.pdf" (1 page, 41
+636 bytes).
+PDF statistics:
+ 23 PDF objects out of 1000 (max. 8388607)
+ 13 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+
