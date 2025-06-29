@@ -16,7 +16,7 @@ def remove_patterns_from_file(file_path: Path, patterns: regex.Pattern):
         )
 
 
-def convert(file_path, output_folder, format='pdf', image_format='png', dpi=200):
+def convert(file_path, output_folder, zip_folder, format='pdf', image_format='png', dpi=200):
     os.makedirs(output_folder, exist_ok=True)
     if format == 'pdf':
         shutil.copy(file_path, output_folder / file_path.name)
@@ -47,5 +47,5 @@ def convert(file_path, output_folder, format='pdf', image_format='png', dpi=200)
     if len(list(output_folder.glob('*'))) == 1:
         return Path(str(output_folder / file_path.stem) + '.' + format)
 
-    shutil.make_archive(str(output_folder.parent / 'zip_output' / file_path.stem), 'zip', root_dir=output_folder)
-    return Path(str(output_folder.parent / 'zip_output' / file_path.stem) + '.zip')
+    shutil.make_archive(str(zip_folder / file_path.stem), 'zip', root_dir=output_folder)
+    return Path(str(zip_folder / file_path.stem) + '.zip')
