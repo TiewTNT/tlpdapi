@@ -62,5 +62,9 @@ async def api(
         dpi=dpi
     )
 
-    # background_tasks.add_task(cleanup, hash)
-    return # FileResponse() (not now)
+    background_tasks.add_task(cleanup, hash)
+    return FileResponse(
+        final_path,
+        media_type='application/zip' if final_path.suffix == '.zip' else f'application/{format}',
+        filename=final_path.name
+    )
