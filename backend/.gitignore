@@ -1,1 +1,5 @@
 app/__pycache__/
+compiled_output/*
+converted_output/*
+project_folders/*
+zip_output/*

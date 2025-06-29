@@ -27,7 +27,7 @@ def convert(file_path, output_folder, format='pdf', image_format='png', dpi=200)
             subprocess.run(['pdftohtml', '-c', '-s', '-noframes', str(file_path),
                         Path(str(output_folder / file_path.stem) + '.html')], check=True)
             remove_patterns_from_file(Path(str(output_folder / file_path.stem) + '.html'),
-                                    regex.compile(rf'<img\s+width="\d+"\s+height="\d+"\s+src="{regex.escape(file_path.stem)}001\.png"\s+alt="background image"\s*/?>', regex.DOTALL))
+                                    regex.compile(rf'<img\s+width="\d+"\s+height="\d+"\s+src="{regex.escape(file_path.stem)}\d+\.png"\s+alt="background image"\s*/?>', regex.DOTALL))
             
             subprocess.run(['pandoc', Path(str(output_folder / file_path.stem) + '.html'), '-t', 'markdown_strict',
                         '-o', Path(str(output_folder / file_path.stem) + '.md')], check=True)
