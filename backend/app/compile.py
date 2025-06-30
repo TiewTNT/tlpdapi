@@ -17,6 +17,7 @@ DANGEROUS_COMMANDS = {
 def compile(file_folder: Path,
             output_folder: Path,
             engine: str = 'pdflatex',
+            macro: str = 'latex',
             tools: list = (),
             compiles: int = 2) -> Path:
     shutil.copytree(file_folder, output_folder, dirs_exist_ok=True)
@@ -31,7 +32,7 @@ def compile(file_folder: Path,
     output_folder.mkdir(parents=True, exist_ok=True)
     stem = file_path.stem
 
-    if engine == 'context':
+    if macro == 'context':
         # Context writes *all* outputs into cwd; include file_folder on TEXINPUTS if needed
         subprocess.run(
             ['context', str(file_path)],
@@ -58,7 +59,7 @@ def compile(file_folder: Path,
             else:
                 # most tools want just the basename, no extension
                 subprocess.run(
-                    [cmd, stem] + tool.strip().split()[1:],
+                    [*tool.split(), stem],
                     cwd=output_folder,
                     check=True
                 )

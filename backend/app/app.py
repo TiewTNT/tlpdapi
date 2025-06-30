@@ -40,11 +40,13 @@ async def api(
     background_tasks: BackgroundTasks,
     files: List[UploadFile] = File(),
     engine: str = Form('pdflatex'),
+    macro: str = Form('latex'),
     format: str = Form('pdf'),
     format_image: str = Form('png'),
     dpi: int = Form(200),
     tools: List[str] = Form([]),
     compiles: int = Form(3),
+    compile_tool: str = Form('manual')
 ):
 
     hash = str(hashlib.sha256(
@@ -65,6 +67,8 @@ async def api(
         file_folder=PROJECTS_DIR / hash,
         output_folder=OUTPUT_DIR / hash,
         engine=engine,
+        macro=macro,
+        compile_tool=compile_tool,
         tools=tools,
         compiles=int(compiles)
     )
