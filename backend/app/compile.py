@@ -33,11 +33,15 @@ def compile(file_folder: Path,
 
     if engine == 'context':
         # Context writes *all* outputs into cwd; include file_folder on TEXINPUTS if needed
+        env = os.environ.copy()
+        env["TEXINPUTS"] = f"{str(file_folder)}:"
+
         subprocess.run(
-            ['context', str(file_path)],
-            cwd=output_folder,
-            check=True,
-        )
+    ['context', str(file_path)],
+    cwd=output_folder,
+    env=env,
+    check=True,
+)
     else:
         # 1) First pdflatex pass → writes .aux, .pdf, etc into output_folder
         subprocess.run([
