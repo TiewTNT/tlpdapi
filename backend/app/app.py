@@ -19,6 +19,18 @@ CONVERTED_OUTPUT_DIR = ROOT / 'converted_output'
 ZIP_OUTPUT_DIR = ROOT / 'zip_output'
 PROJECTS_DIR = ROOT / 'project_folders'
 
+mime_types = {
+    "html": "text/html",
+    "md": "text/markdown",
+    "txt": "text/plain",
+    "pdf": "application/pdf",
+    "png": "image/png",
+    "jpg": "image/jpeg",
+    "jpeg": "image/jpeg",
+    "webp": "image/webp",
+    "zip": "application/zip",
+}
+
 
 app = FastAPI()
 
@@ -85,6 +97,6 @@ async def api(
     background_tasks.add_task(cleanup, hash)
     return FileResponse(
         final_path,
-        media_type='application/zip' if final_path.suffix == '.zip' else f'application/{format}',
-        filename=final_path.name
+        media_type=mime_types.get(final_path.suffix[1:], 'application/octet-stream'),
+        filename=final_path.stem + ('.zip' if final_path.suffix == '.zip' else f'.{format if format != "raster" else format_image}')
     )

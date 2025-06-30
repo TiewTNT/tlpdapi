@@ -43,9 +43,10 @@ def convert(file_path, output_folder, zip_folder, format='pdf', image_format='pn
                        Path(str(output_folder / file_path.stem) + '.'+image_format)], check=True)
     else:
         raise ValueError(f"Unsupported format: {format}")
-
+    
+    actual_format = format if format != 'raster' else image_format
     if len(list(output_folder.glob('*'))) == 1:
-        return Path(str(output_folder / file_path.stem) + '.' + format)
+        return output_folder / Path(file_path.stem + '.' + actual_format)
 
     shutil.make_archive(str(zip_folder / file_path.stem), 'zip', root_dir=output_folder)
     return Path(str(zip_folder / file_path.stem) + '.zip')
