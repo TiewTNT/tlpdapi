@@ -76,7 +76,7 @@ async def api(
     final_path = convert(
         file_path=pdf_path,
         output_folder=CONVERTED_OUTPUT_DIR / hash,
-        zip_folder=ZIP_OUTPUT,
+        zip_folder=ZIP_OUTPUT_DIR,
         format=format,
         image_format=format_image,
         dpi=dpi

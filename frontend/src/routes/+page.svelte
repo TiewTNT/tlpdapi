@@ -2,12 +2,17 @@
     let files = [];
     let format;
     let format_image;
-    let dpi;
+    let dpi = 200;
+    let compile_tool = "latexmk";
+    let macro = "latex";
     async function submit() {
         const formData = new FormData();
         for (const file of files) formData.append("files", file);
         formData.append("format", format);
         formData.append("format_image", format_image);
+        formData.append("dpi", dpi);
+        formData.append("compile_tool", compile_tool);
+        formData.append("macro", macro);
 
         const res = await fetch("http://localhost:8000/api", {
             method: "POST",
@@ -47,11 +52,21 @@
         <option value="raster">Raster</option>
     </select>
 
+    <select bind:value={macro}>
+        <option value="latex">LaTeX</option>
+        <option value="context">ConTeXt</option>
+    </select>
+
     <select bind:value={format_image}>
         <option value="png">PNG</option>
         <option value="jpg">JPG</option>
         <option value="webp">WebP</option>
     </select>
+
+    <!-- <select bind:value={compile_tool}>
+        <option value="latexmk">LaTeXmk</option>
+        <option value="manual">Manual</option>
+    </select> Tools specification on frontend not supported -->
 
     <input
         type="number"

@@ -19,6 +19,7 @@ def compile(file_folder: Path,
             engine: str = 'pdflatex',
             macro: str = 'latex',
             tools: list = (),
+            compile_tool: str = 'manual',
             compiles: int = 2) -> Path:
     shutil.copytree(file_folder, output_folder, dirs_exist_ok=True)
     # find the .tex
@@ -35,43 +36,59 @@ def compile(file_folder: Path,
     if macro == 'context':
         # Context writes *all* outputs into cwd; include file_folder on TEXINPUTS if needed
         subprocess.run(
-    ['context', str(file_path)],
-    cwd=output_folder,
-    check=True,
-)
+        ['context', str(file_path)],
+        cwd=output_folder,
+        check=True,
+    )
     else:
-        # 1) First pdflatex pass → writes .aux, .pdf, etc into output_folder
-        subprocess.run([
-            engine,
-            "-interaction=nonstopmode",
-            "-output-directory", str(output_folder),
-            str(file_path)
-        ], cwd=file_folder, check=True)
-
-        # 2) Run your post-processors (bibtex, makeindex, …) *inside* output_folder
-        for tool in tools:
-            cmd = tool.strip().split()[0].lower()
-            if cmd in DANGEROUS_COMMANDS:
-                if cmd == 'sl':
-                    print("Choo choo trains are not allowed!")
-                else:
-                    print(f"Skipping potentially harmful command: {tool}")
-            else:
-                # most tools want just the basename, no extension
-                subprocess.run(
-                    [*tool.split(), stem],
-                    cwd=output_folder,
-                    check=True
-                )
-
-        # 3) Remaining pdflatex passes to resolve references
-        for _ in range(compiles - 1):
+        if compile_tool == 'manual':
+            # 1) First pdflatex pass → writes .aux, .pdf, etc into output_folder
             subprocess.run([
                 engine,
                 "-interaction=nonstopmode",
                 "-output-directory", str(output_folder),
                 str(file_path)
             ], cwd=file_folder, check=True)
+
+            # 2) Run your post-processors (bibtex, makeindex, …) *inside* output_folder
+            for tool in tools:
+                cmd = tool.strip().split()[0].lower()
+                if cmd in DANGEROUS_COMMANDS:
+                    if cmd == 'sl':
+                        print("Choo choo trains are not allowed!")
+                    else:
+                        print(f"Skipping potentially harmful command: {tool}")
+                else:
+                    # most tools want just the basename, no extension
+                    subprocess.run(
+                        [*tool.split(), stem],
+                        cwd=output_folder,
+                        check=True
+                    )
+
+            # 3) Remaining pdflatex passes to resolve references
+            for _ in range(compiles - 1):
+                subprocess.run([
+                    engine,
+                    "-interaction=nonstopmode",
+                    "-output-directory", str(output_folder),
+                    str(file_path)
+                ], cwd=file_folder, check=True)
+        elif compile_tool == 'latexmk':
+            # Use latexmk to handle the compilation process
+            subprocess.run([
+                'latexmk',
+                '-'+engine,
+                '-outdir='+ str(output_folder),
+                file_path
+            ], cwd=file_folder, check=True)
+        # elif compile_tool == 'tectonic': # tectonic is not included in texlive-full
+        #     # Use tectonic for compilation
+        #     subprocess.run([
+        #         'tectonic',
+        #         str(file_path),
+        #         '--outdir', str(output_folder)
+        #     ], cwd=file_folder, check=True)
 
     # finally, point at your new PDF
     return output_folder / f"{stem}.pdf"
