@@ -32,14 +32,11 @@ def compile(file_folder: Path,
     stem = file_path.stem
 
     if engine == 'context':
-        # Context writes *all* outputs into cwd; include file_folder on TEXINPUTS if needed
-        env = os.environ.copy()
-        env["TEXINPUTS"] = f"{str(file_folder)}:"
+
 
         subprocess.run(
     ['context', str(file_path)],
     cwd=output_folder,
-    env=env,
     check=True,
 )
     else:
