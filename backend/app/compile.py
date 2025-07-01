@@ -14,6 +14,7 @@ DANGEROUS_COMMANDS = {
     "mktemp", "mkfifo", "xargs", "env", "set", "export", "sl"
 }
 
+
 def compile(file_folder: Path,
             output_folder: Path,
             engine: str = 'pdflatex',
@@ -36,10 +37,10 @@ def compile(file_folder: Path,
     if macro == 'context':
         # Context writes *all* outputs into cwd; include file_folder on TEXINPUTS if needed
         subprocess.run(
-        ['context', str(file_path)],
-        cwd=output_folder,
-        check=True,
-    )
+            ['context', str(file_path)],
+            cwd=output_folder,
+            check=True,
+        )
     else:
         if compile_tool == 'manual':
             # 1) First pdflatex pass → writes .aux, .pdf, etc into output_folder
@@ -78,8 +79,9 @@ def compile(file_folder: Path,
             # Use latexmk to handle the compilation process
             subprocess.run([
                 'latexmk',
-                '-'+engine,
-                '-outdir='+ str(output_folder),
+                f'-pdflatex="{engine} -interaction=nonstopmode"',
+                '-pdf',
+                '-outdir=' + str(output_folder),
                 file_path
             ], cwd=file_folder, check=True)
         # elif compile_tool == 'tectonic': # tectonic is not included in texlive-full
@@ -91,4 +93,4 @@ def compile(file_folder: Path,
         #     ], cwd=file_folder, check=True)
 
     # finally, point at your new PDF
-    return output_folder / f"{stem}.pdf"
+    return output_folder / f"{stem}.pdf", stem

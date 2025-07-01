@@ -1,5 +1,5 @@
 from fastapi import FastAPI, File, Form, UploadFile, BackgroundTasks
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from typing import List
 import hashlib
 from pathlib import Path
@@ -36,7 +36,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -44,8 +44,14 @@ app.add_middleware(
 
 
 def cleanup(hash):
-    shutil.rmtree(OUTPUT_DIR / hash, ignore_errors=True)
-    shutil.rmtree(PROJECTS_DIR / hash, ignore_errors=True)
+    try:
+        shutil.rmtree(PROJECTS_DIR / hash, ignore_errors=True)
+        shutil.rmtree(OUTPUT_DIR / hash, ignore_errors=True)
+        shutil.rmtree(CONVERTED_OUTPUT_DIR / hash, ignore_errors=True)
+        os.remove(ZIP_OUTPUT_DIR / (hash + '.zip'))
+    except Exception as e:
+        print('Cleanup failed: '+str(e))
+    return
 
 
 @app.post('/api')
@@ -75,28 +81,42 @@ async def api(
     if len(files) == 1 and Path(files[0].filename).suffix == '.zip':
         shutil.unpack_archive(PROJECTS_DIR / hash /
                               files[0].filename, PROJECTS_DIR / hash)
+    # background_tasks.add_task(cleanup, hash)
+    try:
+        pdf_path, stem = compile(
+            file_folder=PROJECTS_DIR / hash,
+            output_folder=OUTPUT_DIR / hash,
+            engine=engine,
+            macro=macro,
+            compile_tool=compile_tool,
+            tools=tools,
+            compiles=int(compiles)
+        )
+        final_path = convert(
+            file_path=pdf_path,
+            output_folder=CONVERTED_OUTPUT_DIR / hash,
+            zip_folder=ZIP_OUTPUT_DIR,
+            format=format,
+            image_format=format_image,
+            dpi=dpi
+        )
+    except Exception as e:
+        print(e)
+        return JSONResponse(content={
+            "error": str(e),
+            "message": "Error during compile or conversion process."
+        }, status_code=500)
 
-    pdf_path = compile(
-        file_folder=PROJECTS_DIR / hash,
-        output_folder=OUTPUT_DIR / hash,
-        engine=engine,
-        macro=macro,
-        compile_tool=compile_tool,
-        tools=tools,
-        compiles=int(compiles)
-    )
-    final_path = convert(
-        file_path=pdf_path,
-        output_folder=CONVERTED_OUTPUT_DIR / hash,
-        zip_folder=ZIP_OUTPUT_DIR,
-        format=format,
-        image_format=format_image,
-        dpi=dpi
-    )
-
-    background_tasks.add_task(cleanup, hash)
-    return FileResponse(
-        final_path,
-        media_type=mime_types.get(final_path.suffix[1:], 'application/octet-stream'),
-        filename=final_path.stem + ('.zip' if final_path.suffix == '.zip' else f'.{format if format != "raster" else format_image}')
-    )
+    else:
+        if not final_path.exists():
+            print("Final path doesn't exist.")
+            return JSONResponse(content={
+                "error": str(e),
+                "message": "Error during compile or conversion process."
+            }, status_code=500)
+        return FileResponse(
+            final_path,
+            media_type=mime_types.get(
+                final_path.suffix[1:], 'application/octet-stream'),
+            filename=stem + (final_path.suffix)
+        )
