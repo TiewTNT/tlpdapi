@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 import os
 
-PORT = os.getenv('PORT', '8000')
+PORT = os.getenv('PORT', '10000')
 
 current_file = Path(__file__)
 current_dir = current_file.resolve().parent
