@@ -1,19 +1,19 @@
 # --------- FRONTEND BUILD STAGE ---------
 FROM node:20 AS frontend
 
-WORKDIR /app/frontend
+WORKDIR /frontend/
 
-COPY frontend/package*.json ./
 RUN npm install
 
-COPY frontend/ ./
 RUN npm run build
 
 
 # --------- BACKEND STAGE ---------
-FROM texlive/texlive:latest AS backend
+FROM texlive/texlive:latest
 
-# System dependencies for Python & unzip
+WORKDIR /
+
+# System dependencies for Python
 RUN apt-get update && \
     apt-get install -y python3 python3-pip poppler
 
