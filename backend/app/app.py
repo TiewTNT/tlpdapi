@@ -83,7 +83,7 @@ async def api(
     if len(files) == 1 and Path(files[0].filename).suffix == '.zip':
         shutil.unpack_archive(PROJECTS_DIR / hash /
                               files[0].filename, PROJECTS_DIR / hash)
-    # background_tasks.add_task(cleanup, hash)
+    background_tasks.add_task(cleanup, hash)
     try:
         pdf_path, stem = compile(
             file_folder=PROJECTS_DIR / hash,

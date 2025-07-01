@@ -22,7 +22,7 @@ RUN apt-get update && \
     poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /
 
 # Python dependencies
 COPY backend/requirements.txt ./backend/
