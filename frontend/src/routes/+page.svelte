@@ -31,7 +31,7 @@
         formData.append("macro", macro);
         formData.append("engine", engine)
 
-        const res = await fetch("http://127.0.0.1:8000/api", {
+        const res = await fetch("http://0.0.0.0:8000/api", {
             method: "POST",
             body: formData,
         });
