@@ -26,7 +26,9 @@ def compile(file_folder: Path,
     if len(list(file_folder.rglob("*"))) == 1 and Path(list(file_folder.rglob("*"))[0]).suffix == '.zip':
         print('UNPACKING ZIP')
         shutil.unpack_archive(str(file_folder / Path(list(file_folder.rglob("*"))[0]).stem) + '.zip', str(output_folder))
-        output_folder = output_folder / Path(list(file_folder.rglob("*"))[0]).stem
+        if os.name == "nt":
+            output_folder = output_folder / Path(list(file_folder.rglob("*"))[0]).stem
+
     else:
         print('FILE FOLDER RGLOB *:', file_folder.rglob("*"))
         shutil.copytree(file_folder, output_folder, dirs_exist_ok=True)
