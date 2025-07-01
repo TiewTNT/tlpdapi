@@ -22,7 +22,7 @@ WORKDIR /app
 COPY backend/ ./backend/
 COPY backend/run.py ./
 # Copy your Makefile if still needed
-COPY backend/Makefile ./
+COPY Makefile ./
 
 # Copy built frontend into appropriate directory
 COPY --from=frontend /app/frontend/build ./frontend/build

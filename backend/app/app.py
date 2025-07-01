@@ -10,7 +10,7 @@ from compile import compile
 from convert import convert
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
-import subprocess
+import httpx
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 BACKEND = ROOT / 'backend'
@@ -55,6 +55,13 @@ def cleanup(hash):
         print('Cleanup failed: '+str(e))
     return
 
+async def send_webhook(url: str, payload: dict):
+    async with httpx.AsyncClient() as client:
+        try:
+            await client.post(url, json=payload)
+        except Exception as e:
+            print(f"Webhook error: {e}")
+
 
 @app.post('/api')
 async def api(
@@ -67,7 +74,8 @@ async def api(
     dpi: int = Form(200),
     tools: List[str] = Form([]),
     compiles: int = Form(3),
-    compile_tool: str = Form('manual')
+    compile_tool: str = Form('manual'),
+    webhook_url: str | None = None,
 ):
 
     hash = str(hashlib.sha256(
@@ -104,6 +112,8 @@ async def api(
         )
     except Exception as e:
         print(e)
+        if webhook_url:
+            background_tasks.add_task(send_webhook, webhook_url, {"status": "error during compile / convert", "code": 1})
         return JSONResponse(content={
             "error": str(e),
             "message": "Error during compile or conversion process."
@@ -112,10 +122,14 @@ async def api(
     else:
         if not final_path.exists():
             print("Final path doesn't exist.")
+            if webhook_url:
+                background_tasks.add_task(send_webhook, webhook_url, {"status": "error: final path does not exist", "code": 1})
             return JSONResponse(content={
                 "error": str(e),
                 "message": "Error during compile or conversion process."
             }, status_code=500)
+        if webhook_url:
+            background_tasks.add_task(send_webhook, webhook_url, {"status": "success", "code": 0})
         return FileResponse(
             final_path,
             media_type=mime_types.get(

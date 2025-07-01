@@ -1,11 +1,11 @@
 # TXCPAPI
 
-**TXCPAPI** (pronounced *tek-sac-pay-pee*, obviously) is a minimalist, anarchic API for compiling LaTeX files. It runs without authentication, without rate limiting, and without shame. If you're looking for security, stability, or adult supervision... this isn't it.
+**TXCPAPI** (pronounced *tek-sac-pay-pee*, obviously) is a minimalist, anarchic API for compiling TeX files. It runs without authentication, without rate limiting, and without shame. If you're looking for security, stability, or adult supervision... this isn't it.
 
 ## 🚀 What It Does
 
 - Accepts `.tex` or `.zip` uploads via a `/api` endpoint
-- Compiles the files using LaTeX engines (`pdflatex`, `xelatex`, etc.)
+- Compiles the files using LaTeX engines (`pdflatex`, `xelatex`, etc.) or ConTeXt
 - Converts output to various formats: PDF, HTML, Markdown, plain text, images
 - Returns the final result directly—no signup, no storage, no questions asked
 
