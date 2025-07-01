@@ -11,6 +11,7 @@ from convert import convert
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
+import asyncio
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 BACKEND = ROOT / 'backend'
@@ -55,12 +56,34 @@ def cleanup(hash):
         print('Cleanup failed: '+str(e))
     return
 
+
 async def send_webhook(url: str, payload: dict):
     async with httpx.AsyncClient() as client:
         try:
             await client.post(url, json=payload)
         except Exception as e:
             print(f"Webhook error: {e}")
+
+
+def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir, engine, macro, compile_tool, tools, compiles, format, format_image, dpi):
+    pdf_path, stem = compile(
+        file_folder=file_folder,
+        output_folder=output_folder,
+        engine=engine,
+        macro=macro,
+        compile_tool=compile_tool,
+        tools=tools,
+        compiles=int(compiles)
+    )
+    final_path = convert(
+        file_path=pdf_path,
+        output_folder=converted_output_folder,
+        zip_folder=zip_dir,
+        format=format,
+        image_format=format_image,
+        dpi=dpi
+    )
+    return final_path, stem
 
 
 @app.post('/api')
@@ -74,7 +97,7 @@ async def api(
     dpi: int = Form(200),
     tools: List[str] = Form([]),
     compiles: int = Form(3),
-    compile_tool: str = Form('manual'),
+    compile_tool: str = Form('latexmk'),
     webhook_url: str | None = None,
 ):
 
@@ -93,27 +116,25 @@ async def api(
                               files[0].filename, PROJECTS_DIR / hash)
     background_tasks.add_task(cleanup, hash)
     try:
-        pdf_path, stem = compile(
-            file_folder=PROJECTS_DIR / hash,
-            output_folder=OUTPUT_DIR / hash,
-            engine=engine,
-            macro=macro,
-            compile_tool=compile_tool,
-            tools=tools,
-            compiles=int(compiles)
+        final_path, stem = await asyncio.wait_for(
+            asyncio.to_thread(compile_convert, PROJECTS_DIR / hash, OUTPUT_DIR / hash, CONVERTED_OUTPUT_DIR /
+                              hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, tools, compiles, format, format_image, dpi),
+            timeout=120
         )
-        final_path = convert(
-            file_path=pdf_path,
-            output_folder=CONVERTED_OUTPUT_DIR / hash,
-            zip_folder=ZIP_OUTPUT_DIR,
-            format=format,
-            image_format=format_image,
-            dpi=dpi
-        )
+    except asyncio.TimeoutError as e:
+        print(e)
+        if webhook_url:
+            background_tasks.add_task(send_webhook, webhook_url, {
+                                      "status": "timeout", "code": 1})
+        return JSONResponse(content={
+            "error": str(e),
+            "message": "Subprocesses timed out"
+        }, status_code=500)
     except Exception as e:
         print(e)
         if webhook_url:
-            background_tasks.add_task(send_webhook, webhook_url, {"status": "error during compile / convert", "code": 1})
+            background_tasks.add_task(send_webhook, webhook_url, {
+                                      "status": "error during compile / convert", "code": 1})
         return JSONResponse(content={
             "error": str(e),
             "message": "Error during compile or conversion process."
@@ -123,13 +144,15 @@ async def api(
         if not final_path.exists():
             print("Final path doesn't exist.")
             if webhook_url:
-                background_tasks.add_task(send_webhook, webhook_url, {"status": "error: final path does not exist", "code": 1})
+                background_tasks.add_task(send_webhook, webhook_url, {
+                                          "status": "error: final path does not exist", "code": 1})
             return JSONResponse(content={
                 "error": str(e),
                 "message": "Error during compile or conversion process."
             }, status_code=500)
         if webhook_url:
-            background_tasks.add_task(send_webhook, webhook_url, {"status": "success", "code": 0})
+            background_tasks.add_task(send_webhook, webhook_url, {
+                                      "status": "success", "code": 0})
         return FileResponse(
             final_path,
             media_type=mime_types.get(
