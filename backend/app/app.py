@@ -1,5 +1,6 @@
 from fastapi import FastAPI, File, Form, UploadFile, BackgroundTasks
 from fastapi.responses import FileResponse, JSONResponse, Response
+from fastapi.staticfiles import StaticFiles
 from typing import List
 import hashlib
 from pathlib import Path
@@ -9,15 +10,17 @@ from compile import compile
 from convert import convert
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
+import subprocess
 
+ROOT = Path(__file__).resolve().parent.parent.parent
+BACKEND = ROOT / 'backend'
+FRONTEND = ROOT / 'frontend'
 
-ROOT = Path(__file__).resolve().parent.parent
-
-APP_DIR = ROOT / 'app'
-OUTPUT_DIR = ROOT / 'compiled_output'
-CONVERTED_OUTPUT_DIR = ROOT / 'converted_output'
-ZIP_OUTPUT_DIR = ROOT / 'zip_output'
-PROJECTS_DIR = ROOT / 'project_folders'
+APP_DIR = BACKEND / 'app'
+OUTPUT_DIR = BACKEND / 'compiled_output'
+CONVERTED_OUTPUT_DIR = BACKEND / 'converted_output'
+ZIP_OUTPUT_DIR = BACKEND / 'zip_output'
+PROJECTS_DIR = BACKEND / 'project_folders'
 
 mime_types = {
     "html": "text/html",
@@ -31,6 +34,7 @@ mime_types = {
     "zip": "application/zip",
 }
 
+subprocess.run(['npm', 'run', 'build'], cwd=FRONTEND, shell=True)
 
 app = FastAPI()
 
@@ -120,3 +124,6 @@ async def api(
                 final_path.suffix[1:], 'application/octet-stream'),
             filename=stem + (final_path.suffix)
         )
+
+app.mount("/", StaticFiles(directory=FRONTEND /
+          'build', html=True), name="static")
