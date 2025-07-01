@@ -34,8 +34,6 @@ mime_types = {
     "zip": "application/zip",
 }
 
-subprocess.run(['npm', 'run', 'build'], cwd=FRONTEND, shell=True)
-
 app = FastAPI()
 
 app.add_middleware(
