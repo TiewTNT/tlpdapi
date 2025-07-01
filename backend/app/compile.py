@@ -26,6 +26,7 @@ def compile(file_folder: Path,
     if len(list(file_folder.rglob("*"))) == 1 and Path(list(file_folder.rglob("*"))[0]).suffix == '.zip':
         print('UNPACKING ZIP')
         shutil.unpack_archive(str(file_folder / Path(list(file_folder.rglob("*"))[0]).stem) + '.zip', str(output_folder))
+        print('OUTPUT DIRECTORY FOR COMPILE FUNCTION BEFORE CHANGE:', output_folder)
         if os.name == "nt":
             output_folder = output_folder / Path(list(file_folder.rglob("*"))[0]).stem
 
@@ -90,6 +91,7 @@ def compile(file_folder: Path,
             # Use latexmk to handle the compilation process
             subprocess.run([
                 'latexmk',
+                '-f',
                 f'-pdflatex="{engine} -interaction=nonstopmode"',
                 '-pdf',
                 '-outdir=' + str(output_folder),
