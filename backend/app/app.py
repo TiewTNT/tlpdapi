@@ -12,6 +12,7 @@ from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 import asyncio
+from time import sleep
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 BACKEND = ROOT / 'backend'
@@ -46,8 +47,9 @@ app.add_middleware(
 )
 
 
-def cleanup(hash):
+async def cleanup(hash):
     try:
+        await sleep(1)
         shutil.rmtree(PROJECTS_DIR / hash, ignore_errors=True)
         shutil.rmtree(OUTPUT_DIR / hash, ignore_errors=True)
         shutil.rmtree(CONVERTED_OUTPUT_DIR / hash, ignore_errors=True)
