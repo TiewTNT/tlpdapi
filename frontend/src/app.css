@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 body {
-    font-family: system-ui, sans-serif;
+    font-family: "Noto Serif", serif;
     background: #353637;
     color: #edf4da;
     --background-color: #353637;
@@ -15,6 +15,13 @@ body {
     --error-bg-hover: #e1643b;
     --disabled: #4d525d;
     margin: 2rem;
+}
+
+h1 {
+    font-size: 64px;
+    text-align: center;
+    width: 100%;
+    font-family: "Noto Serif Display", serif;
 }
 
 input[type="file"],
