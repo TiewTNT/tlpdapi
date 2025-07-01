@@ -1,21 +1,27 @@
 # TXCPAPI
 
-An API for compiling TeX.
+**TXCPAPI** (pronounced *tek-sac-pay-pee*, obviously) is a minimalist, anarchic API for compiling LaTeX files. It runs without authentication, without rate limiting, and without shame. If you're looking for security, stability, or adult supervision... this isn't it.
 
-## What it does
+## 🚀 What It Does
 
-It compiles your TeX file. If it works.
+- Accepts `.tex` or `.zip` uploads via a `/api` endpoint
+- Compiles the files using LaTeX engines (`pdflatex`, `xelatex`, etc.)
+- Converts output to various formats: PDF, HTML, Markdown, plain text, images
+- Returns the final result directly—no signup, no storage, no questions asked
 
-## Licenses
+## 📦 Technologies
 
-This project uses the following open source tools:
+This project uses the following open-source tools:
 
-- [Svelte](https://github.com/sveltejs/svelte) — MIT License
-- [FastAPI](https://github.com/tiangolo/fastapi) — MIT License
-- [Uvicorn](https://github.com/encode/uvicorn) — BSD 3-Clause License
-- [Python](https://docs.python.org/3/license.html) — PSF License
-- [TeX Live](https://www.tug.org/texlive/copying.html) — Collection of licenses, mostly free software (GPL, LPPL, etc.)
-- [Poppler](https://poppler.freedesktop.org/) — GPL License
+| Tool | License |
+|------|---------|
+| [Svelte](https://github.com/sveltejs/svelte) | MIT |
+| [FastAPI](https://github.com/tiangolo/fastapi) | MIT |
+| [Uvicorn](https://github.com/encode/uvicorn) | BSD 3-Clause |
+| [Python](https://docs.python.org/3/license.html) | PSF |
+| [TeX Live](https://www.tug.org/texlive/copying.html) | Collection of free software licenses (GPL, LPPL, etc.) |
+| [Poppler](https://poppler.freedesktop.org/) | GPL |
+| [Pandoc](https://github.com/jgm/pandoc/blob/main/COPYING) | GPL 2.0 |
+| [ImageMagick](https://github.com/ImageMagick/ImageMagick/blob/main/LICENSE) | ImageMagick License |
 
-
-> Only Svelte is included in this repository. Other dependencies are installed at runtime and are not redistributed. Please refer to each project’s website for full license terms.
+> Only Svelte is included in this repository. All other dependencies are installed at runtime and are not redistributed. Please refer to each project's official license for full legal information.

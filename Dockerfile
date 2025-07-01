@@ -1,39 +1,35 @@
-# --------- FRONTEND BUILD STAGE ---------
+# --- Frontend Build Stage ---
 FROM node:20 AS frontend
-
 WORKDIR /app/frontend
 
 COPY frontend/package*.json ./
 RUN npm install
-
 COPY frontend/ ./
 RUN npm run build
 
+# --- Backend Stage ---
+FROM texlive/texlive:latest
 
-# --------- BACKEND STAGE ---------
-FROM texlive/texlive:latest AS backend
-
-# System dependencies for Python and PDF tools
+# Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    python3 \
-    python3-pip \
-    unzip \
-    poppler-utils \
-    && rm -rf /var/lib/apt/lists/*
+      python3 python3-pip unzip poppler-utils imagemagick pandoc && \
+    rm -rf /var/lib/apt/lists/*
 
-WORKDIR /
+WORKDIR /app
 
-# Python dependencies
-COPY backend/requirements.txt ./backend/
-RUN python3 -m pip install --break-system-packages --no-cache-dir -r backend/requirements.txt
+# Copy backend and related files
+COPY backend/ ./backend/
+COPY backend/run.py ./
+# Copy your Makefile if still needed
+COPY backend/Makefile ./
 
-# Copy backend code
-COPY backend ./backend
-
-# Copy built frontend
+# Copy built frontend into appropriate directory
 COPY --from=frontend /app/frontend/build ./frontend/build
+
+# Install Python deps
+RUN python3 -m pip install --break-system-packages --no-cache-dir -r backend/requirements.txt
 
 EXPOSE 8000
 
-RUN make build && make run
+CMD make run
