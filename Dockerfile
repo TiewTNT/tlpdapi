@@ -20,12 +20,9 @@ WORKDIR /app
 
 # Copy backend and related files
 COPY backend/ ./backend/
-COPY backend/run.py ./
+
 # Copy your Makefile if still needed
 COPY Makefile ./
-
-# Copy built frontend into appropriate directory
-COPY --from=frontend /app/frontend/build ./frontend/build
 
 # Install Python deps
 RUN python3 -m pip install --break-system-packages --no-cache-dir -r backend/requirements.txt

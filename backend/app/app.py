@@ -49,7 +49,6 @@ app.add_middleware(
 
 async def cleanup(hash):
     try:
-        await sleep(1)
         shutil.rmtree(PROJECTS_DIR / hash, ignore_errors=True)
         shutil.rmtree(OUTPUT_DIR / hash, ignore_errors=True)
         shutil.rmtree(CONVERTED_OUTPUT_DIR / hash, ignore_errors=True)
