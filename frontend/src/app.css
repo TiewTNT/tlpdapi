@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 body {
-    font-family: "Noto Serif", serif;
+    font-family: "Noto Sans", sans-serif;
     background: #353637;
     color: #edf4da;
     --background-color: #353637;
@@ -79,6 +79,7 @@ button:active {
 
 button:disabled {
     background-color: var(--disabled);
+    border: 1px solid var(--border-color);
 }
 
 .error {

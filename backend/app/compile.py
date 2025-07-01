@@ -22,16 +22,25 @@ def compile(file_folder: Path,
             tools: list = (),
             compile_tool: str = 'manual',
             compiles: int = 2) -> Path:
-    shutil.copytree(file_folder, output_folder, dirs_exist_ok=True)
+    
+    if len(list(file_folder.rglob("*"))) == 1 and Path(list(file_folder.rglob("*"))[0]).suffix == '.zip':
+        print('UNPACKING ZIP')
+        shutil.unpack_archive(str(file_folder / Path(list(file_folder.rglob("*"))[0]).stem) + '.zip', str(output_folder))
+        output_folder = output_folder / Path(list(file_folder.rglob("*"))[0]).stem
+    else:
+        print('FILE FOLDER RGLOB *:', file_folder.rglob("*"))
+        shutil.copytree(file_folder, output_folder, dirs_exist_ok=True)
     # find the .tex
     file_path = output_folder / 'main.tex'
     if not file_path.exists():
-        candidates = list(file_folder.glob('*.tex'))
+        candidates = list(output_folder.rglob('*.tex'))
+        print(candidates, 'CANDIDATES')
         if not candidates:
             raise FileNotFoundError("No .tex file in the provided folder.")
         file_path = candidates[0]
 
     output_folder.mkdir(parents=True, exist_ok=True)
+
     stem = file_path.stem
 
     if macro == 'context':
@@ -49,7 +58,7 @@ def compile(file_folder: Path,
                 "-interaction=nonstopmode",
                 "-output-directory", str(output_folder),
                 str(file_path)
-            ], cwd=file_folder, check=True)
+            ], cwd=output_folder, check=True)
 
             # 2) Run your post-processors (bibtex, makeindex, …) *inside* output_folder
             for tool in tools:
@@ -74,7 +83,7 @@ def compile(file_folder: Path,
                     "-interaction=nonstopmode",
                     "-output-directory", str(output_folder),
                     str(file_path)
-                ], cwd=file_folder, check=True)
+                ], cwd=output_folder, check=True)
         elif compile_tool == 'latexmk':
             # Use latexmk to handle the compilation process
             subprocess.run([
@@ -83,7 +92,7 @@ def compile(file_folder: Path,
                 '-pdf',
                 '-outdir=' + str(output_folder),
                 file_path
-            ], cwd=file_folder, check=True)
+            ], cwd=output_folder, check=True)
         # elif compile_tool == 'tectonic': # tectonic is not included in texlive-full
         #     # Use tectonic for compilation
         #     subprocess.run([

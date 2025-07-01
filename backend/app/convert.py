@@ -48,5 +48,5 @@ def convert(file_path, output_folder, zip_folder, format='pdf', image_format='pn
     if len(list(output_folder.glob('*'))) == 1:
         return output_folder / Path(file_path.stem + '.' + actual_format)
 
-    shutil.make_archive(str(zip_folder / file_path.stem), 'zip', root_dir=output_folder)
+    shutil.make_archive(file_path.stem, 'zip', root_dir=zip_folder)
     return Path(str(zip_folder / file_path.stem) + '.zip')
