@@ -26,7 +26,7 @@ WORKDIR /app
 
 # Python dependencies
 COPY backend/requirements.txt ./backend/
-RUN pip3 install --no-cache-dir -r backend/requirements.txt
+RUN pythpn3 -m pip install --no-cache-dir -r backend/requirements.txt
 
 # Copy backend code
 COPY backend ./backend
