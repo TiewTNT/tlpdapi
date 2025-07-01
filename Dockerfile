@@ -15,8 +15,7 @@ FROM texlive/texlive:latest AS backend
 
 # System dependencies for Python & unzip
 RUN apt-get update && \
-    apt-get install -y python3 python3-pip poppler && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y python3 python3-pip poppler
 
 WORKDIR /app
 
