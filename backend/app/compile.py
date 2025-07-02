@@ -48,8 +48,10 @@ def compile(file_folder: Path,
 
     tex_exists = False
     for tex_path in tex_paths:
-        if (output_root / tex_path.relative_to(compile_folder.anchor)).exists():
+        print('CHECKING IF PATH',tex_path,'EXISTS')
+        if (output_root / tex_path.relative_to(tex_path.anchor)).exists():
             tex_exists = True
+            tex_path = output_root / tex_path.relative_to(tex_path.anchor)
         else:
             tex_paths.remove(tex_path)
 
@@ -64,7 +66,8 @@ def compile(file_folder: Path,
 
     for tex_path in tex_paths:
         
-        file_path = output_root/tex_path.relative_to(compile_folder.anchor)
+        file_path = tex_path
+        
         print('ATTEMPTING TO COMPILE', file_path)
         stem = file_path.stem
 
