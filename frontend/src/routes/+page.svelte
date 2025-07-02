@@ -20,6 +20,7 @@
         if (files.length === 0) {
             text = "Please select files to compile.";
             loading = false;
+            compile_button.disabled = false;
             return;
         }
         const formData = new FormData();
