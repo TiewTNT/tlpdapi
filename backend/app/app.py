@@ -66,18 +66,20 @@ async def send_webhook(url: str, payload: dict):
             print(f"Webhook error: {e}")
 
 
-def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir, engine, macro, compile_tool, tools, compiles, format, format_image, dpi):
-    pdf_path, stem = compile(
+def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir, engine, macro, compile_tool, compile_folder, tex_paths, tools, compiles, format, format_image, dpi):
+    pdf_paths, stem = compile(
         file_folder=file_folder,
         output_folder=output_folder,
         engine=engine,
         macro=macro,
         compile_tool=compile_tool,
         tools=tools,
-        compiles=int(compiles)
+        compiles=int(compiles),
+        compile_folder=Path(compile_folder),
+        tex_paths=[Path(tex_path) for tex_path in tex_paths]
     )
     final_path = convert(
-        file_path=pdf_path,
+        file_paths=pdf_paths,
         output_folder=converted_output_folder,
         zip_folder=zip_dir,
         format=format,
@@ -99,6 +101,8 @@ async def api(
     tools: List[str] = Form([]),
     compiles: int = Form(3),
     compile_tool: str = Form('latexmk'),
+    compile_folder: str = Form('/'),
+    tex_paths: List[str] = Form(['/main.tex']),
     webhook_url: str | None = None,
 ):
 
@@ -116,7 +120,7 @@ async def api(
     try:
         final_path, stem = await asyncio.wait_for(
             asyncio.to_thread(compile_convert, PROJECTS_DIR / hash, OUTPUT_DIR / hash, CONVERTED_OUTPUT_DIR /
-                              hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, tools, compiles, format, format_image, dpi),
+                              hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, Path(compile_folder), tex_paths, tools, compiles, format, format_image, dpi),
             timeout=120
         )
     except asyncio.TimeoutError as e:
