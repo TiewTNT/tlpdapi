@@ -46,7 +46,7 @@
             compile_button.classList.add("error");
             return;
         } else {
-            const disposition = res.headers.get("Content-Disposition");
+            const disposition = await res.headers.get("Content-Disposition");
             let filename = 'file';
             if (disposition) {
                 filename = disposition.split('filename=')[1].slice(1, -1)

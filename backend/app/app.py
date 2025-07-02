@@ -145,7 +145,7 @@ async def api(
                 background_tasks.add_task(send_webhook, webhook_url, {
                                           "status": "error: final path does not exist", "code": 1})
             return JSONResponse(content={
-                "error": str(e),
+                "error": "",
                 "message": "Error during compile or conversion process."
             }, status_code=500)
         if webhook_url:
