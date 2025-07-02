@@ -35,10 +35,9 @@ def compile(file_folder: Path,
     output_root = output_folder
     output_root.mkdir(parents=True, exist_ok=True)
     rglob = list(file_folder.rglob("*"))
-    if len(rglob) == 1 and Path(rglob[0]).suffix in ['.zip', '.tar', '7z']:
-        print('UNPACKING ARCHIVE')
-        shutil.unpack_archive(str(file_folder / Path(rglob[0]).stem) + Path(rglob[0]).suffix, str(output_folder))
-        print('OUTPUT DIRECTORY FOR COMPILE FUNCTION BEFORE CHANGE:', output_folder)
+    if len(rglob) == 1 and Path(rglob[0]).suffix in ['.zip', '.tar', '.tar.gz', '.tar.bz2']:
+        print('UNPACKING', Path(rglob[0]).suffix.upper(),'ARCHIVE')
+        shutil.unpack_archive(str(rglob[0]), str(output_folder))
     else:
         print('FILE FOLDER RGLOB *:', file_folder.rglob("*"))
         shutil.copytree(file_folder, output_root, dirs_exist_ok=True)
