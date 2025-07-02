@@ -116,7 +116,7 @@ async def api(
         with file_path.open('wb') as f:
             shutil.copyfileobj(file.file, f)
 
-    # background_tasks.add_task(cleanup, hash)
+    background_tasks.add_task(cleanup, hash)
     try:
         final_path, stem = await asyncio.wait_for(
             asyncio.to_thread(compile_convert, PROJECTS_DIR / hash, OUTPUT_DIR / hash, CONVERTED_OUTPUT_DIR /

@@ -34,9 +34,10 @@ def compile(file_folder: Path,
     
     output_root = output_folder
     output_root.mkdir(parents=True, exist_ok=True)
-    if len(list(file_folder.rglob("*"))) == 1 and Path(list(file_folder.rglob("*"))[0]).suffix == '.zip':
-        print('UNPACKING ZIP')
-        shutil.unpack_archive(str(file_folder / Path(list(file_folder.rglob("*"))[0]).stem) + '.zip', str(output_folder))
+    rglob = list(file_folder.rglob("*"))
+    if len(rglob) == 1 and Path(rglob[0]).suffix in ['.zip', '.tar', '7z']:
+        print('UNPACKING ARCHIVE')
+        shutil.unpack_archive(str(file_folder / Path(rglob[0]).stem) + Path(rglob[0]).suffix, str(output_folder))
         print('OUTPUT DIRECTORY FOR COMPILE FUNCTION BEFORE CHANGE:', output_folder)
     else:
         print('FILE FOLDER RGLOB *:', file_folder.rglob("*"))
