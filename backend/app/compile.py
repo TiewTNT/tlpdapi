@@ -48,7 +48,7 @@ def compile(file_folder: Path,
 
     tex_exists = False
     for tex_path in tex_paths:
-        if (output_root/tex_path).exists():
+        if (output_root / tex_path.relative_to(compile_folder.anchor)).exists():
             tex_exists = True
         else:
             tex_paths.remove(tex_path)
@@ -63,9 +63,9 @@ def compile(file_folder: Path,
         tex_paths.append(candidates[0])
 
     for tex_path in tex_paths:
-
-        file_path = output_root/tex_path
-
+        
+        file_path = output_root/tex_path.relative_to(compile_folder.anchor)
+        print('ATTEMPTING TO COMPILE', file_path)
         stem = file_path.stem
 
         if macro == 'context':
