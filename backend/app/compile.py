@@ -62,7 +62,7 @@ def compile(file_folder: Path,
         print(candidates, 'CANDIDATES')
         if not candidates:
             raise FileNotFoundError("No .tex file in the provided folder.")
-        tex_paths.append(candidates[0])
+        tex_paths = candidates
 
     for tex_path in tex_paths:
         
