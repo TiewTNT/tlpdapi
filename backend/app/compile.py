@@ -92,7 +92,7 @@ def compile(file_folder: Path,
             subprocess.run([
                 'latexmk',
                 '-f',
-                f'-pdflatex={engine} -interaction=nonstopmode -output-directory {str(output_folder)} {file_path}',
+                f'-pdflatex={engine} -interaction=nonstopmode %O %S',
                 '-pdf',
                 '-outdir=' + str(output_folder),
                 file_path

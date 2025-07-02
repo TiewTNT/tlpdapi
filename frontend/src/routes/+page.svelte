@@ -40,15 +40,31 @@
 
         if (!res.ok) {
             const errText = await res.text(); // <-- important!
+            
             console.error("Server error:", errText);
             text = "Error";
             compile_button.classList.add("error");
             return;
         } else {
+            const disposition = res.headers.get("Content-Disposition");
+            let filename = 'file';
+            if (disposition) {
+                filename = disposition.split('filename=')[1].slice(1, -1)
+            }
+
             text = "Compile";
             const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            window.open(url);
+            const url = window.URL.createObjectURL(blob);
+            // window.open(url);
+
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            console.log(filename)
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
         }
     }
     function handleFiles(e) {
