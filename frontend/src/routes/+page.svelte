@@ -120,9 +120,11 @@
 
   <select bind:value={format}>
     <option value="pdf">PDF</option>
+    {#if advanced}
     <option value="html">HTML</option>
     <option value="md">Markdown</option>
     <option value="txt">Text</option>
+    {/if}
     <option value="raster">Raster</option>
   </select>
 

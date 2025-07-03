@@ -62,6 +62,10 @@
                 <td><a href="https://github.com/ImageMagick/ImageMagick/blob/main/LICENSE">ImageMagick</a></td>
                 <td>ImageMagick License</td>
             </tr>
+            <tr>
+                <td><a href="https://github.com/python-pillow/Pillow">Python-pillow</a></td>
+                <td>MIT-CMU License</td>
+            </tr>
         </tbody>
     </table>
 </div>

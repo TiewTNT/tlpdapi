@@ -170,6 +170,8 @@ async def api(
         if webhook_url:
             background_tasks.add_task(send_webhook, webhook_url, {
                                       "status": "success", "code": 0})
+            
+        print('HASH:', hash)
         return FileResponse(
             final_path,
             media_type=mime_types.get(

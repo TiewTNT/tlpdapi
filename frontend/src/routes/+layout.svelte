@@ -25,7 +25,9 @@
 	rel="stylesheet"
 />
 
-<slot />
+<div class="min-h-screen pb-20 overflow-auto">
+  <slot />
+</div>
 
 <nav>
   {#each navItems as item}
@@ -37,6 +39,4 @@
     </a>
   {/each}
 </nav>
-
-<div style="height:5rem;"></div>
 

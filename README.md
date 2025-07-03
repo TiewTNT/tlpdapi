@@ -34,6 +34,7 @@ This project uses the following open-source tools:
 | [Poppler](https://poppler.freedesktop.org/) | GPL |
 | [Pandoc](https://github.com/jgm/pandoc/blob/main/COPYING) | GPL 2.0 |
 | [ImageMagick](https://github.com/ImageMagick/ImageMagick/blob/main/LICENSE) | ImageMagick License |
+| [Python-pillow] (https://github.com/python-pillow/Pillow) | MIT-CMU License |
 
 > Only Svelte is included in this repository. All other dependencies are installed at runtime and are not redistributed. Please refer to each project's official license for full legal information.
 
