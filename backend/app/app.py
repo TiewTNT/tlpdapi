@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import httpx
 import asyncio
 from time import sleep
+import json
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 BACKEND = ROOT / 'backend'
@@ -66,7 +67,7 @@ async def send_webhook(url: str, payload: dict):
             print(f"Webhook error: {e}")
 
 
-def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir, engine, macro, compile_tool, compile_folder, tex_paths, tools, compiles, format, format_image, dpi):
+def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir, engine, macro, compile_tool, compile_folder, tex_paths, tools, compiles, format, format_image, dpi, bg_color):
     pdf_paths, stem = compile(
         file_folder=file_folder,
         output_folder=output_folder,
@@ -84,7 +85,8 @@ def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir
         zip_folder=zip_dir,
         format=format,
         image_format=format_image,
-        dpi=dpi
+        dpi=dpi,
+        bg_color=bg_color
     )
     return final_path, stem
 
@@ -103,6 +105,7 @@ async def api(
     compile_tool: str = Form('latexmk'),
     compile_folder: str = Form('/'),
     tex_paths: List[str] = Form(['/main.tex']),
+    bg_color: str = Form('{"r":255,"g":255,"b":255,"a":1}'),
     webhook_url: str | None = None,
 ):
 
@@ -110,7 +113,7 @@ async def api(
         datetime.utcnow().isoformat().encode()).hexdigest())
     os.makedirs(PROJECTS_DIR / hash, exist_ok=True)
     os.makedirs(OUTPUT_DIR / hash, exist_ok=True)
-    
+    bg_color = json.loads(bg_color)
 
     background_tasks.add_task(cleanup, hash)
     try:
@@ -132,7 +135,7 @@ async def api(
         )
         final_path, stem = await asyncio.wait_for(
             asyncio.to_thread(compile_convert, PROJECTS_DIR / hash, OUTPUT_DIR / hash, CONVERTED_OUTPUT_DIR /
-                              hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, Path(compile_folder), tex_paths, tools, compiles, format, format_image, dpi),
+                              hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, Path(compile_folder), tex_paths, tools, compiles, format, format_image, dpi, bg_color),
             timeout=120
         )
     except asyncio.TimeoutError as e:
