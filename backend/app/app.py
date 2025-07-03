@@ -110,14 +110,26 @@ async def api(
         datetime.utcnow().isoformat().encode()).hexdigest())
     os.makedirs(PROJECTS_DIR / hash, exist_ok=True)
     os.makedirs(OUTPUT_DIR / hash, exist_ok=True)
-
-    for file in files:
-        file_path = PROJECTS_DIR / hash / file.filename
-        with file_path.open('wb') as f:
-            shutil.copyfileobj(file.file, f)
+    
 
     background_tasks.add_task(cleanup, hash)
     try:
+        size = 0
+        size_limit = 33554432
+        for file in files:
+            file_path = PROJECTS_DIR / hash / file.filename
+            with file_path.open('wb') as f:
+                while True:
+                    chunk = await file.read(1024 * 1024)
+                    if not chunk:
+                        break
+                    size += len(chunk)
+                    f.write(chunk)
+        if size > size_limit:
+            return JSONResponse(
+            status_code=413,
+            content={"error": "File too large", "message": f"Uploads are limited to around {size_limit/(1024**2)}MB total."}
+        )
         final_path, stem = await asyncio.wait_for(
             asyncio.to_thread(compile_convert, PROJECTS_DIR / hash, OUTPUT_DIR / hash, CONVERTED_OUTPUT_DIR /
                               hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, Path(compile_folder), tex_paths, tools, compiles, format, format_image, dpi),
