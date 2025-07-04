@@ -12,7 +12,6 @@ from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 import asyncio
-from time import sleep
 import json
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -67,7 +66,7 @@ async def send_webhook(url: str, payload: dict):
             print(f"Webhook error: {e}")
 
 
-def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir, engine, macro, compile_tool, compile_folder, tex_paths, tools, compiles, format, format_image, dpi, bg_color):
+def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir, engine, macro, compile_tool, compile_folder, tex_paths, tools, compiles, format, format_image, dpi, bg_color, raster_plasma):
     pdf_paths, stem = compile(
         file_folder=file_folder,
         output_folder=output_folder,
@@ -86,7 +85,8 @@ def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir
         format=format,
         image_format=format_image,
         dpi=dpi,
-        bg_color=bg_color
+        bg_color=bg_color,
+        raster_plasma=raster_plasma
     )
     return final_path, stem
 
@@ -106,6 +106,7 @@ async def api(
     compile_folder: str = Form('/'),
     tex_paths: List[str] = Form(['/main.tex']),
     bg_color: str = Form('{"r":255,"g":255,"b":255,"a":1}'),
+    raster_plasma: bool = Form(False),
     webhook_url: str | None = None,
 ):
 
@@ -135,7 +136,7 @@ async def api(
         )
         final_path, stem = await asyncio.wait_for(
             asyncio.to_thread(compile_convert, PROJECTS_DIR / hash, OUTPUT_DIR / hash, CONVERTED_OUTPUT_DIR /
-                              hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, Path(compile_folder), tex_paths, tools, compiles, format, format_image, dpi, bg_color),
+                              hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, Path(compile_folder), tex_paths, tools, compiles, format, format_image, dpi, bg_color, raster_plasma),
             timeout=120
         )
     except asyncio.TimeoutError as e:

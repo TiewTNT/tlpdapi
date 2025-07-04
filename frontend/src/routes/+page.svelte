@@ -1,8 +1,8 @@
 <svelte:options runes />
 
 <script>
-  import { onMount, tick } from 'svelte';
-  import { browser } from '$app/environment';
+  import { onMount, tick } from "svelte";
+  import { browser } from "$app/environment";
 
   // your existing state
   let advanced = $state(false);
@@ -15,6 +15,7 @@
   let loading = $state(false);
   let engine = $state("pdflatex");
   let text = $state("Compile");
+  let raster_plasma = $state(false);
   let compile_button;
 
   // RGBA picker state
@@ -28,7 +29,7 @@
   onMount(async () => {
     // SSR guard + dynamic import
     if (browser) {
-      await import('vanilla-colorful/rgba-color-picker.js');
+      await import("vanilla-colorful/rgba-color-picker.js");
       await tick();
       if (picker) picker.color = bg_color;
     }
@@ -59,6 +60,7 @@
     formData.append("macro", macro);
     formData.append("engine", engine);
     formData.append("bg_color", JSON.stringify(bg_color));
+    formData.append("raster_plasma", raster_plasma);
 
     const res = await fetch("/api", { method: "POST", body: formData });
     loading = false;
@@ -121,9 +123,9 @@
   <select bind:value={format}>
     <option value="pdf">PDF</option>
     {#if advanced}
-    <option value="html">HTML</option>
-    <option value="md">Markdown</option>
-    <option value="txt">Text</option>
+      <option value="html">HTML</option>
+      <option value="md">Markdown</option>
+      <option value="txt">Text</option>
     {/if}
     <option value="raster">Raster</option>
   </select>
@@ -155,6 +157,18 @@
           on:color-changed={handleColorChange}
         />
       {/if}
+      <label class="checkbox">
+        {#if !raster_plasma}
+          <span style="background-color: var(--element-bg);">
+            <img src="/empty_checkbox.svg" alt="Unchecked" />
+          </span>
+        {:else}
+          <span style="background-color: var(--primary-color);">
+            <img src="/check.svg" alt="Checked" />
+          </span>
+        {/if}
+        <input type="checkbox" style="display:none" bind:checked={raster_plasma} /> Noise
+      </label>
     {/if}
   {/if}
 
