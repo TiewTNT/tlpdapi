@@ -1,11 +1,8 @@
 @import 'tailwindcss';
 
 /* === ROOT / BASE === */
-body {
-  font-family: "Noto Sans", sans-serif;
-  background: var(--background-color, #353637);
-  color: var(--text-color, #edf4da);
 
+:root * {
   /* Color tokens */
   --background-color: #353637;
   --primary-color: #558a68;
@@ -18,6 +15,12 @@ body {
   --error-border: #a76e6e;
   --error-bg-hover: #e1643b;
   --disabled: #4d525d;
+}
+
+body {
+  font-family: "Noto Sans", sans-serif;
+  background: var(--background-color, #353637);
+  color: var(--text-color, #edf4da);
 }
 
 /* === TYPOGRAPHY === */
@@ -40,8 +43,6 @@ input[type="number"],
 select,
 button {
   display: block;
-  width: 100%;
-  max-width: 300px;
   margin: 1rem 0;
   padding: 0.5rem;
   font-size: 1rem;
@@ -50,6 +51,11 @@ button {
   background: var(--element-bg);
   box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.15);
   color: var(--text-color-2);
+}
+
+.centered-div label {
+  position: relative;
+  left: 5%;
 }
 
 input[type="number"] {
@@ -74,7 +80,7 @@ select {
 .checkbox {
   display: inline-flex;
   align-items: center;
-  margin: 2rem; 
+  margin: 2rem;
   gap: 0.5rem;
 }
 
@@ -141,7 +147,7 @@ button img {
 .advanced {
   display: inline-flex;
   align-items: center;
-  margin: 2rem; 
+  margin: 2rem;
   gap: 0.5rem;
 }
 
@@ -187,14 +193,20 @@ button img {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90%;
+  width: 100%;
   max-width: 400px;
+  overflow: auto;
+  padding-bottom: 6rem;
+  padding-top: 6rem;
+  display: list-item;
 }
 
 .centered-div *:not(nav):not(.box):not(.checkbox) {
-  width: 100% !important;
-  max-width: 100% !important;
+  width: 90% !important;
+  max-width: 90% !important;
   box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* === IMAGE === */
@@ -255,7 +267,8 @@ thead {
   text-align: left;
 }
 
-th, td {
+th,
+td {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border-color);
 }

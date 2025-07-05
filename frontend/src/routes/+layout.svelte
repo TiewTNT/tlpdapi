@@ -25,7 +25,7 @@
 	rel="stylesheet"
 />
 
-<div class="min-h-screen pb-20 overflow-auto">
+<div class="min-h-screen pb-20 overflow-hidden">
   <slot />
 </div>
 

@@ -103,7 +103,7 @@
 <div class="centered-div">
   <img src="/txcpapi.svg" class="txcpapi" alt="TXCPAPI" />
 
-  <label class="custom-file-label" for="fileUpload">Select Files</label>
+  <label class="custom-file-label">Select Files
   <input
     id="fileUpload"
     type="file"
@@ -111,6 +111,7 @@
     style="display:none"
     on:change={handleFiles}
   />
+  </label>
 
   {#if files.length}
     <ul class="box">
