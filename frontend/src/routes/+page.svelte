@@ -17,6 +17,7 @@
   let engine = $state("pdflatex");
   let text = $state("Compile");
   let raster_plasma = $state(false);
+  let invert = $state(false);
   let compile_button;
 
   // RGBA picker state
@@ -64,6 +65,7 @@
     formData.append("engine", engine);
     formData.append("bg_color", JSON.stringify(bg_color));
     formData.append("raster_plasma", raster_plasma);
+    formData.append("invert", invert);
 
     const res = await fetch("/api", { method: "POST", body: formData });
     loading = false;
@@ -187,6 +189,22 @@
           style="display:none"
           bind:checked={raster_plasma}
         /> Noise
+      </label>
+      <label class="checkbox">
+        {#if !invert}
+          <span style="background-color: var(--element-bg);">
+            <img src="/empty_checkbox.svg" alt="Unchecked" />
+          </span>
+        {:else}
+          <span style="background-color: var(--primary-color);">
+            <img src="/check.svg" alt="Checked" />
+          </span>
+        {/if}
+        <input
+          type="checkbox"
+          style="display:none"
+          bind:checked={invert}
+        /> Invert
       </label>
     {/if}
   {/if}

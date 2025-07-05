@@ -68,8 +68,8 @@ async def send_webhook(url: str, payload: dict):
             print(f"Webhook error: {e}")
 
 
-def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir, engine, macro, compile_tool, compile_folder, tex_paths, tools, compiles, format, format_image, dpi, bg_color, raster_plasma):
-    pdf_paths, stem = compile(
+def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir, engine, macro, compile_tool, compile_folder, tex_paths, tools, compiles, format, format_image, dpi, bg_color, raster_plasma, invert):
+    pdf_paths, stem, command_cwd = compile(
         file_folder=file_folder,
         output_folder=output_folder,
         engine=engine,
@@ -88,7 +88,9 @@ def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir
         image_format=format_image,
         dpi=dpi,
         bg_color=bg_color,
-        raster_plasma=raster_plasma
+        raster_plasma=raster_plasma,
+        invert=invert,
+        cwd=command_cwd
     )
     return final_path, stem
 
@@ -110,6 +112,7 @@ async def api(
     tex_paths: List[str] = Form(['/main.tex']),
     bg_color: str = Form('{"r":255,"g":255,"b":255,"a":1}'),
     raster_plasma: bool = Form(False),
+    invert: bool = Form(False),
     time_limit: int = Form(360),
     webhook_url: str | None = None,
 ):
@@ -120,7 +123,7 @@ async def api(
     os.makedirs(OUTPUT_DIR / hash, exist_ok=True)
     bg_color = json.loads(bg_color)
 
-    background_tasks.add_task(cleanup, hash)
+    # background_tasks.add_task(cleanup, hash)
     try:
         size = 0
         size_limit = 33554432
@@ -140,7 +143,7 @@ async def api(
         )
         final_path, stem = await asyncio.wait_for(
             asyncio.to_thread(compile_convert, PROJECTS_DIR / hash, OUTPUT_DIR / hash, CONVERTED_OUTPUT_DIR /
-                              hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, Path(compile_folder), tex_paths, tools, compiles, format, format_image, dpi, bg_color, raster_plasma),
+                              hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, Path(compile_folder), tex_paths, tools, compiles, format, format_image, dpi, bg_color, raster_plasma, invert),
             timeout=clamp(time_limit, 0, 360)
         )
     except asyncio.TimeoutError as e:
@@ -149,7 +152,7 @@ async def api(
             background_tasks.add_task(send_webhook, webhook_url, {
                                       "status": "timeout", "code": 1})
         return JSONResponse(content={
-            "error": "Time out error.",
+            "error": f"Time out error. The limit is {clamp(time_limit, 0, 360)}.",
             "message": "Subprocesses timed out."
         }, status_code=500)
     except Exception as e:
@@ -182,7 +185,7 @@ async def api(
             final_path,
             media_type=mime_types.get(
                 final_path.suffix[1:], 'application/octet-stream'),
-            filename=secure_filename(download_name) or secure_filename(stem + (final_path.suffix))
+            filename=secure_filename(download_name) if download_name else secure_filename(stem + (final_path.suffix))
         )
 
 app.mount("/", StaticFiles(directory=FRONTEND /

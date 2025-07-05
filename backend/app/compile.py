@@ -122,4 +122,4 @@ def compile(file_folder: Path,
                 ], cwd=output_folder, check=True)
         pdf_paths.append(output_folder / f"{stem}.pdf")
     # finally, point at your new PDF
-    return pdf_paths, stem
+    return pdf_paths, stem, output_folder
