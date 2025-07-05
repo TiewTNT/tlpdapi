@@ -198,7 +198,7 @@ button img {
 }
 
 .box li::marker {
-  content: url('file.svg');
+  content: url('/file.svg');
   width: 1.2em;
   height: 1.2em;
   vertical-align: middle;
@@ -216,7 +216,6 @@ button img {
   overflow: auto;
   padding-bottom: 6rem;
   padding-top: 6rem;
-  display: list-item;
 }
 
 .centered-div *:not(nav):not(.box):not(.checkbox) {

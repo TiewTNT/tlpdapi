@@ -65,26 +65,36 @@
     const res = await fetch("/api", { method: "POST", body: formData });
     loading = false;
     compile_button.disabled = false;
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("Server error:", errText);
-      text = "Error";
-      compile_button.classList.add("error");
-      return;
+    const contentType = res.headers.get("Content-Type");
+
+    if (contentType && contentType.includes("application/json")) {
+      const data = await res.json();
+      if (!res.ok) {
+        console.error("Error:", data);
+        text = "Error: " + (data.error || "Unknown error");
+        compile_button.classList.add("error");
+        return;
+      }
+      // If you get here and it's JSON + OK, you're probably not using this path anyway.
+    } else {
+      // Not JSON — probably a file
+      const blob = await res.blob();
+      const disposition = res.headers.get("Content-Disposition");
+      let filename = "download";
+      if (disposition) {
+        const match = disposition.match(/filename="?([^"]+)"?/);
+        if (match) filename = match[1];
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     }
-    const disposition = res.headers.get("Content-Disposition");
-    let filename = "file";
-    if (disposition) filename = disposition.split("filename=")[1].slice(1, -1);
-    text = "Compile";
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const aEl = document.createElement("a");
-    aEl.href = url;
-    aEl.download = filename;
-    document.body.appendChild(aEl);
-    aEl.click();
-    aEl.remove();
-    URL.revokeObjectURL(url);
   }
 </script>
 
@@ -103,14 +113,15 @@
 <div class="centered-div">
   <img src="/txcpapi.svg" class="txcpapi" alt="TXCPAPI" />
 
-  <label class="custom-file-label">Select Files
-  <input
-    id="fileUpload"
-    type="file"
-    multiple
-    style="display:none"
-    on:change={handleFiles}
-  />
+  <label class="custom-file-label"
+    >Select Files
+    <input
+      id="fileUpload"
+      type="file"
+      multiple
+      style="display:none"
+      on:change={handleFiles}
+    />
   </label>
 
   {#if files.length}
@@ -168,7 +179,11 @@
             <img src="/check.svg" alt="Checked" />
           </span>
         {/if}
-        <input type="checkbox" style="display:none" bind:checked={raster_plasma} /> Noise
+        <input
+          type="checkbox"
+          style="display:none"
+          bind:checked={raster_plasma}
+        /> Noise
       </label>
     {/if}
   {/if}

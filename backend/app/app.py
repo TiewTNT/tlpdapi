@@ -145,16 +145,17 @@ async def api(
             background_tasks.add_task(send_webhook, webhook_url, {
                                       "status": "timeout", "code": 1})
         return JSONResponse(content={
-            "error": str(e),
-            "message": "Subprocesses timed out"
+            "error": "Time out error.",
+            "message": "Subprocesses timed out."
         }, status_code=500)
     except Exception as e:
         print(e)
         if webhook_url:
             background_tasks.add_task(send_webhook, webhook_url, {
                                       "status": "error during compile / convert", "code": 1})
+        
         return JSONResponse(content={
-            "error": str(e),
+            "error": str(e).split(':')[0],
             "message": "Error during compile or conversion process."
         }, status_code=500)
 
@@ -165,7 +166,7 @@ async def api(
                 background_tasks.add_task(send_webhook, webhook_url, {
                                           "status": "error: final path does not exist", "code": 1})
             return JSONResponse(content={
-                "error": "",
+                "error": "Error",
                 "message": "Error during compile or conversion process."
             }, status_code=500)
         if webhook_url:
