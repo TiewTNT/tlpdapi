@@ -246,7 +246,7 @@ nav {
   display: grid;
   grid-auto-flow: column;
   text-align: center;
-  backdrop-filter: blur(3px) brightness(60%) contrast(70%);
+  backdrop-filter: blur(7px) brightness(60%) contrast(70%);
   border: 1px solid var(--border-color);
   border-radius: 1rem;
   color: var(--text-color-2);
