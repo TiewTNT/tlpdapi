@@ -1,4 +1,4 @@
-<div style="display:block;margin-left:auto;margin-right:auto;width:40%">
+<div style="display:block;margin-left:auto;margin-right:auto;width:90%;max-width:30rem">
     <img src="/txcpapi.svg" class="txcpapi" alt="TXCPAPI" />
     <div style="text-align: justify;">
         <p>
