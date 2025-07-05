@@ -13,6 +13,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import httpx
 import asyncio
 import json
+from werkzeug.utils import secure_filename
+from utils import clamp
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 BACKEND = ROOT / 'backend'
@@ -104,9 +106,11 @@ async def api(
     compiles: int = Form(3),
     compile_tool: str = Form('latexmk'),
     compile_folder: str = Form('/'),
+    download_name: str | None = None,
     tex_paths: List[str] = Form(['/main.tex']),
     bg_color: str = Form('{"r":255,"g":255,"b":255,"a":1}'),
     raster_plasma: bool = Form(False),
+    time_limit: int = Form(360),
     webhook_url: str | None = None,
 ):
 
@@ -137,7 +141,7 @@ async def api(
         final_path, stem = await asyncio.wait_for(
             asyncio.to_thread(compile_convert, PROJECTS_DIR / hash, OUTPUT_DIR / hash, CONVERTED_OUTPUT_DIR /
                               hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, Path(compile_folder), tex_paths, tools, compiles, format, format_image, dpi, bg_color, raster_plasma),
-            timeout=120
+            timeout=clamp(time_limit, 0, 360)
         )
     except asyncio.TimeoutError as e:
         print(e)
@@ -155,7 +159,7 @@ async def api(
                                       "status": "error during compile / convert", "code": 1})
         
         return JSONResponse(content={
-            "error": str(e).split(':')[0],
+            "error": str(e)[:15],
             "message": "Error during compile or conversion process."
         }, status_code=500)
 
@@ -178,7 +182,7 @@ async def api(
             final_path,
             media_type=mime_types.get(
                 final_path.suffix[1:], 'application/octet-stream'),
-            filename=stem + (final_path.suffix)
+            filename=secure_filename(download_name) or secure_filename(stem + (final_path.suffix))
         )
 
 app.mount("/", StaticFiles(directory=FRONTEND /

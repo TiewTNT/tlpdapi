@@ -4,3 +4,4 @@ uvicorn
 regex
 httpx
 pillow
+werkzeug

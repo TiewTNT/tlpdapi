@@ -2,6 +2,7 @@ import subprocess
 from pathlib import Path
 import os
 import shutil
+from utils import safe
 
 DANGEROUS_COMMANDS = {
     "rm", "rmdir", "mv", "cp", "dd", "mkfs", "fsck", "shutdown", "reboot",
@@ -14,13 +15,7 @@ DANGEROUS_COMMANDS = {
     "mktemp", "mkfifo", "xargs", "env", "set", "export", "sl"
 }
 
-def safe(path: Path, base: Path):
-    try:
-        path.resolve().relative_to(base.resolve())
-    except ValueError:
-        print('PATH', path, 'IS NOT SAFE RELATIVE TO', base)
-        return False
-    return True
+
 
 def compile(file_folder: Path,
             output_folder: Path,
@@ -47,13 +42,16 @@ def compile(file_folder: Path,
         print('COMPILE CWD', output_folder, 'SAFE')
 
     tex_exists = False
-    for tex_path in tex_paths:
+    tex_trimmed = tex_paths
+    for tex_path in tex_trimmed:
         print('CHECKING IF PATH',tex_path,'EXISTS')
         if (output_root / tex_path.relative_to(tex_path.anchor)).exists():
             tex_exists = True
             tex_path = output_root / tex_path.relative_to(tex_path.anchor)
         else:
-            tex_paths.remove(tex_path)
+            tex_trimmed.remove(tex_path)
+
+    text_paths = tex_trimmed
 
     pdf_paths = []
 
@@ -68,7 +66,8 @@ def compile(file_folder: Path,
         
         file_path = tex_path
         
-        print('ATTEMPTING TO COMPILE', file_path)
+        print('ATTEMPTING TO COMPILE', file_path, 'FROM', output_folder)
+        print('COMPILE FOLDER IS', compile_folder)
         stem = file_path.stem
 
         if macro == 'context':

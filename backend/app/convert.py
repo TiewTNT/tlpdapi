@@ -5,6 +5,7 @@ import os
 import tempfile
 from PIL import Image
 import io
+from utils import clamp
 
 
 # def remove_patterns_from_file(file_path: Path, patterns: regex.Pattern):
@@ -17,16 +18,7 @@ import io
 #             regex.sub(patterns, '', html)
 #         )
 
-def clamp(number: float | int, min_val: float | int, max_val: float | int) -> int | float:
-    clamped = 0
-    if number < min_val:
-        clamped = min_val
-    if number > max_val:
-        clamped = max_val
-    if int(clamped) == clamped:
-        return int(clamped)
-    else:
-        return clamped
+
 
 
 def convert(file_paths, output_folder, zip_folder, format='pdf', image_format='png', dpi=200, bg_color={"r": 255, "g": 255, "b": 255, "a": 1}, raster_plasma=False):
@@ -131,7 +123,7 @@ def convert(file_paths, output_folder, zip_folder, format='pdf', image_format='p
     actual_format = format if format != 'raster' else image_format
 
     # If exactly one output file is produced, return it
-    output_files = list(output_folder.rglob(f'{file_path.stem}*.{actual_format}'))
+    output_files = list(output_folder.rglob(f'*'))
     if len(output_files) == 1:
         return output_files[0]
 

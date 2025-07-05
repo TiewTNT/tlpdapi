@@ -40,6 +40,7 @@ h2 {
 /* === FORM ELEMENTS === */
 input[type="file"],
 input[type="number"],
+input[type="text"],
 select,
 button {
   display: block;

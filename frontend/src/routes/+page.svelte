@@ -11,6 +11,7 @@
   let format_image = $state("png");
   let dpi = $state(200);
   let compile_tool = $state("latexmk");
+  let compile_path = $state("/");
   let macro = $state("latex");
   let loading = $state(false);
   let engine = $state("pdflatex");
@@ -57,6 +58,8 @@
     formData.append("format_image", format_image);
     formData.append("dpi", dpi);
     formData.append("compile_tool", compile_tool);
+    formData.append("compile_folder", compile_path);
+    console.log("compile_path:", compile_path);
     formData.append("macro", macro);
     formData.append("engine", engine);
     formData.append("bg_color", JSON.stringify(bg_color));
@@ -199,6 +202,10 @@
       <option value="lualatex">LuaLaTeX</option>
       <option value="xelatex">XeLaTeX</option>
     </select>
+  {/if}
+
+  {#if advanced}
+    <input type="text" placeholder="Compile path" bind:value={compile_path}/>
   {/if}
 
   <button name="compile_button" on:click={submit}>
