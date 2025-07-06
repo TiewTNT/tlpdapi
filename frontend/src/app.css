@@ -3,7 +3,6 @@
 /* === ROOT / BASE === */
 
 :root * {
-  /* Color tokens */
   --background-color: #353637;
   --primary-color: #558a68;
   --secondary-color: #547e6a;
@@ -17,15 +16,12 @@
   --disabled: #4d525d;
 }
 
-
-
 body {
   font-family: "Noto Sans", sans-serif;
-  background: var(--background-color, #353637);
+  background: var(--background-color);
   color: var(--text-color, #edf4da);
 }
 
-/* === TYPOGRAPHY === */
 h1 {
   font-size: 4rem;
   text-align: center;
@@ -39,7 +35,6 @@ h2 {
   margin-bottom: 1rem;
 }
 
-/* === FORM ELEMENTS === */
 input[type="file"],
 input[type="number"],
 input[type="text"],
@@ -54,6 +49,10 @@ button {
   background: var(--element-bg);
   box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.15);
   color: var(--text-color-2);
+}
+
+.file-row {
+  margin: 0;
 }
 
 .centered-div label {
@@ -88,10 +87,7 @@ select {
 }
 
 .checkbox span {
-  /* width: 50x !important;
-  height: 50px !important; */
   border-radius: 0.375rem;
-  /* transform: scale(1.5); */
   box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.15);
 }
 
@@ -101,7 +97,6 @@ select {
   -webkit-user-drag: none;
 }
 
-/* === BUTTONS === */
 button {
   display: flex;
   justify-content: center;
@@ -134,7 +129,6 @@ button img {
   max-height: 100%;
 }
 
-/* === ERROR STATE === */
 .error {
   background-color: var(--error-bg);
   color: var(--text-color-2);
@@ -146,7 +140,6 @@ button img {
   background-color: var(--error-bg-hover);
 }
 
-/* === ADVANCED TOGGLE === */
 .advanced {
   display: inline-flex;
   align-items: center;
@@ -167,16 +160,47 @@ button img {
   -webkit-user-drag: none;
 }
 
-/* === CUSTOM FILE LABEL === */
+#file_select,
+#file_select .custom-file-label {
+  width: 100% !important;
+  max-width: none !important;
+}
+
 .custom-file-label {
-  display: inline-block;
   padding: 0.5rem 1rem;
   background-color: var(--primary-color);
   color: var(--text-color-2);
   cursor: pointer;
   border-radius: 0.375rem;
   border: 1px solid var(--border-color-accent);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  /* force label to fill grid cell */
+  width: 100% !important;
+  box-sizing: border-box;
 }
+
+#file_select {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 1rem;
+
+  width: 98% !important;
+  max-width: 100% !important;
+}
+
+.trash-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-right: 1rem !important;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 
 /* === FILE LIST === */
 .box {
@@ -191,18 +215,32 @@ button img {
   width: 90%;
   word-wrap: break-word;
   list-style-type: none;
+  list-style: none;
+  list-style-position: inside;
+  /* etc */
 }
 
-.box li { 
-  padding-left: 0.5em;
-  bottom: 0.5em;
+.box li {
+  display: flex;
+  align-items: center;
+  padding: 0.25em 0;
 }
 
-.box li::marker {
+.box li::before {
   content: url('/file.svg');
+  display: block;
+  flex: 0 0 auto;      /* icon never grows or shrinks */
+  margin-right: 0.5em;
   width: 1.2em;
   height: 1.2em;
-  vertical-align: middle;
+}
+
+/* ——— the magic for early wrapping ——— */
+.li-text {
+  flex: 1 1 0;             /* can shrink smaller than its content */
+  min-width: 0;            /* override default “min-content” constraint */
+  overflow-wrap: anywhere; /* break at any character if needed */
+  /* legacy alias if you like: word-wrap: break-word; */
 }
 
 
@@ -218,8 +256,7 @@ button img {
   padding-bottom: 6rem;
   padding-top: 6rem;
 }
-
-.centered-div *:not(nav):not(.box):not(.checkbox) {
+.centered-div > *:not(nav):not(.box):not(.checkbox) {
   width: 90% !important;
   max-width: 90% !important;
   box-sizing: border-box;
@@ -227,7 +264,6 @@ button img {
   margin-right: auto;
 }
 
-/* === IMAGE === */
 .txcpapi {
   width: 100%;
   height: auto;
@@ -235,7 +271,6 @@ button img {
   margin-bottom: 2rem;
 }
 
-/* === NAVIGATION === */
 nav {
   position: fixed;
   bottom: 2rem;
@@ -266,7 +301,6 @@ a:hover {
   text-decoration: underline;
 }
 
-/* === TABLES === */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -293,4 +327,9 @@ td {
 
 tr:last-child td {
   border-bottom: none;
+}
+
+/* === DRAG VISUALS === */
+.dragging {
+  border: var(--border-color-accent) dashed 3px;
 }

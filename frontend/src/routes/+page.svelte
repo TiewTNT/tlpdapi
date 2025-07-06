@@ -24,21 +24,33 @@
   let bg_color = $state({ r: 255, g: 255, b: 255, a: 1 });
   let picker = $state();
 
-  const dropzone = document.getElementById("file_select");
+  function dropzone(node) {
+    const onDragOver = e => {
+      e.preventDefault();
+      node.classList.add('dragging');
+    };
+    const onDragLeave = () => {
+      node.classList.remove('dragging');
+    };
+    const onDrop = e => {
+      e.preventDefault();
+      node.classList.remove('dragging');
+      const dropped = Array.from(e.dataTransfer.files);
+      files = [...files, ...dropped];
+    };
 
+    node.addEventListener('dragover',  onDragOver);
+    node.addEventListener('dragleave',  onDragLeave);
+    node.addEventListener('drop',      onDrop);
 
-onMount(() => {
-  const dropzone = document.getElementById("file_select");
-  if (!dropzone) return;
-
-  dropzone.addEventListener("dragover", e => e.preventDefault());
-
-  dropzone.addEventListener("drop", (e) => {
-    e.preventDefault();
-    const dropped_files = Array.from(e.dataTransfer.files);
-    files = [...files, ...dropped_files];
-  });
-});
+    return {
+      destroy() {
+        node.removeEventListener('dragover',  onDragOver);
+        node.removeEventListener('dragleave',  onDragLeave);
+        node.removeEventListener('drop',      onDrop);
+      }
+    };
+  }
   function handleColorChange(e) {
     bg_color = e.detail.value;
   }
@@ -56,6 +68,10 @@ onMount(() => {
 
   function handleFiles(e) {
     files = Array.from(e.target.files);
+  }
+
+  function clearFiles(e) {
+    files = [];
   }
 
   async function submit() {
@@ -121,7 +137,9 @@ onMount(() => {
 <!-- Markup -->
 <label class="advanced">
   {#if !advanced}
-    <span style="background-color: var(--element-bg);"><img src="/empty_checkbox.svg" alt="Unchecked" /></span>
+    <span style="background-color: var(--element-bg);"
+      ><img src="/empty_checkbox.svg" alt="Unchecked" /></span
+    >
   {:else}
     <span style="background-color: var(--primary-color);">
       <img src="/check.svg" alt="Checked" />
@@ -132,26 +150,34 @@ onMount(() => {
 
 <div class="centered-div">
   <img src="/txcpapi.svg" class="txcpapi" alt="TXCPAPI" />
-  <span id="file_select">
-  <label class="custom-file-label" 
-    >Select Files
-    <input
-      id="fileUpload"
-      type="file"
-      multiple
-      style="display:none"
-      onchange={handleFiles}
-    />
-  </label>
-</span>
+    <div id="file_select">
+      <label class="custom-file-label" use:dropzone>
+        Select Files
+        <input
+          id="fileUpload"
+          type="file"
+          multiple
+          style="display: none"
+          onchange={handleFiles}
+        />
+      </label>
+      <img
+        src="/trash.svg"
+        alt="Deselect files"
+        class="trash-icon"
+        onclick={clearFiles}
+      />
+    </div>
 
-  {#if files.length}
-    <ul class="box">
-      {#each files as f}
-        <li>{f.name}</li>
-      {/each}
-    </ul>
-  {/if}
+    {#if files.length}
+      <ul class="box" use:dropzone>
+        {#each files as f}
+          <span class="li-text">
+            <li>{f.name}</li>
+          </span>
+        {/each}
+      </ul>
+    {/if}
 
   <select bind:value={format}>
     <option value="pdf">PDF</option>
