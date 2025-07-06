@@ -19,29 +19,32 @@ from utils import clamp, generate_frag
 #         )
 
 
-def convert(file_paths, output_folder, zip_folder, format='pdf', image_format='png', dpi=200, bg_color={"r": 255, "g": 255, "b": 255, "a": 1}, raster_plasma=False, invert=False, frag_path: str | Path | None=None, cwd: str | Path | None=None):
+def convert(file_paths, output_folder, zip_folder, format='pdf', image_format='png', dpi=200, bg_color={"r": 255, "g": 255, "b": 255, "a": 1}, raster_plasma=False, invert=False, frag_path: str | Path | None=None, use_frag: bool = False, cwd: str | Path | None=None):
     if not cwd:
         cwd = Path(file_paths[0]) if Path(file_paths[0]).isdir() else Path(file_paths[0]).parent
     else:
         cwd = Path(cwd)
 
-    if frag_path:
-        if Path(frag_path.exists()):
-            ...
+    if use_frag:
+        if frag_path:
+            if Path(frag_path).exists():
+                ...
+            else:
+                frag_files = []
+                for frag in list(cwd.rglob("*.frag")):
+                    frag_files.append(frag)
+                if frag_files:
+                    frag_path = frag_files[0]
+                else:
+                    frag_path = None
         else:
             frag_files = []
             for frag in list(cwd.rglob("*.frag")):
                 frag_files.append(frag)
             if frag_files:
                 frag_path = frag_files[0]
-            else:
-                frag_file = None
     else:
-        frag_files = []
-        for frag in list(cwd.rglob("*.frag")):
-            frag_files.append(frag)
-        if frag_files:
-            frag_path = frag_files[0]
+        frag_path = None
 
     os.makedirs(output_folder, exist_ok=True)
     for file_path in file_paths:
@@ -86,11 +89,11 @@ def convert(file_paths, output_folder, zip_folder, format='pdf', image_format='p
                     w, h = img.width, img.height
                 rgba = f"rgba({bg_color['r']},{bg_color['g']},{bg_color['b']},{bg_color['a']})"
                 # Create background
-                if raster_plasma and not frag_path:
+                if raster_plasma:
                     bg_image = subprocess.run([
                         "magick", "-size", f"{w}x{h}", f"plasma:{rgba}-{rgba}", "-modulate", "100,15,100", "PNG32:-"
                     ], stdout=subprocess.PIPE, check=True, cwd=cwd).stdout
-                    bg_image_plain = subprocess.run([
+                    bg_image_overlay = subprocess.run([
                         "magick", "-size", f"{w}x{h}", f"canvas:{rgba}", "PNG32:-"
                     ], stdout=subprocess.PIPE, check=True, cwd=cwd).stdout
 
@@ -99,57 +102,62 @@ def convert(file_paths, output_folder, zip_folder, format='pdf', image_format='p
                         "magick", "-size", f"{w}x{h}", f"canvas:{rgba}", "PNG32:-"
                     ], stdout=subprocess.PIPE, check=True, cwd=cwd).stdout
 
-                with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as bg_tmp, \
-                        tempfile.NamedTemporaryFile(suffix=".png", delete=False) as fg_tmp, \
-                    tempfile.NamedTemporaryFile(suffix=".png", delete=False) as plain_tmp:
+                with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as bg_tmp_file, \
+                        tempfile.NamedTemporaryFile(suffix=".png", delete=False) as fg_tmp_file, \
+                        tempfile.NamedTemporaryFile(suffix=".png", delete=False) as over_tmp_file:
+
+                    bg_path = Path(bg_tmp_file.name)
+                    fg_path = Path(fg_tmp_file.name)
+                    overlay_path = Path(over_tmp_file.name)
 
                     if not frag_path:
-                        bg_tmp.write(bg_image)
+                        bg_path.write_bytes(bg_image)
                         if raster_plasma:
-                            plain_tmp.write(bg_image_plain)
-                        fg_tmp.write(page_path.read_bytes())
-                        bg_tmp.flush()
-                        fg_tmp.flush()
-                        plain_tmp.flush()
+                            overlay_path.write_bytes(bg_image_overlay)
+                        fg_path.write_bytes(page_path.read_bytes())
                     else:
-                        fg_tmp.write(page_path.read_bytes())
-                        generate_frag(frag_path, bg_tmp.name, w, h)
-                        fg_tmp.flush()
-                        bg_tmp.flush()
+                        fg_path.write_bytes(page_path.read_bytes())
+                        generate_frag(frag_path, bg_path, w, h)
+                        if raster_plasma:
+                            overlay_path.write_bytes(bg_image)
 
-                if raster_plasma and not frag_path:
-                    subprocess.run([
+                if raster_plasma:
+                    composite_output = bg_path.parent / "overlayed_bg.png"
+                    composite_cmd = [
                         "magick",
-                        bg_tmp.name,
+                        str(bg_path),
                         "(",
-                        plain_tmp.name,
+                        str(overlay_path),
                         "-alpha", "Set",
                         "-channel", "A",
-                        "-evaluate", "Multiply", str(0.75),
+                        "-evaluate", "Multiply", "0.75",
                         "+channel",
                         ")",
                         "-compose", "Screen",
                         "-composite",
-                        str(Path(bg_tmp.name).parent / "overlayed_bg.png")
-                    ], cwd=cwd)
-                    os.unlink(bg_tmp.name)
-                    bg_tmp = Path(bg_tmp.name).parent / "overlayed_bg.png"
+                        str(composite_output)
+                    ]
+                    proc = subprocess.run(composite_cmd, check=True, cwd=cwd,
+                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    if not composite_output.exists():
+                        raise FileNotFoundError(f"Magick composite failed: {proc.stderr.decode()}")
+                    bg_path = composite_output
+
                 out_page = output_folder / f"{page_path.stem}.{image_format}"
                 final_composite = [
-                    "magick", "composite"
-                ]
-                
-                final_composite += [
-                    fg_tmp.name,
-                    bg_tmp if raster_plasma and not frag_path else bg_tmp.name,
+                    "magick", "composite",
+                    str(fg_path),
+                    str(bg_path),
                     str(out_page)
                 ]
                 subprocess.run(final_composite, check=True, cwd=cwd)
 
-                if (not raster_plasma) or frag_path:
-                    os.unlink(bg_tmp.name)
-                os.unlink(fg_tmp.name)
-                os.unlink(plain_tmp.name)
+                # Clean up
+                if bg_path.exists() and "overlayed_bg" not in bg_path.name:
+                    os.unlink(bg_path)
+                os.unlink(fg_path)
+                os.unlink(overlay_path)
+
 
             shutil.rmtree(raster_dir)
 

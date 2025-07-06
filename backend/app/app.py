@@ -68,7 +68,7 @@ async def send_webhook(url: str, payload: dict):
             print(f"Webhook error: {e}")
 
 
-def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir, engine, macro, compile_tool, compile_folder, tex_paths, tools, compiles, format, format_image, dpi, bg_color, raster_plasma, invert):
+def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir, engine, macro, compile_tool, compile_folder, tex_paths, tools, compiles, format, format_image, dpi, bg_color, raster_plasma, invert, frag_path, use_frag):
     pdf_paths, stem, command_cwd = compile(
         file_folder=file_folder,
         output_folder=output_folder,
@@ -90,6 +90,8 @@ def compile_convert(file_folder, output_folder, converted_output_folder, zip_dir
         bg_color=bg_color,
         raster_plasma=raster_plasma,
         invert=invert,
+        frag_path=frag_path,
+        use_frag=use_frag,
         cwd=command_cwd
     )
     return final_path, stem
@@ -113,6 +115,8 @@ async def api(
     bg_color: str = Form('{"r":255,"g":255,"b":255,"a":1}'),
     raster_plasma: bool = Form(False),
     invert: bool = Form(False),
+    frag_path: str | Path | None = Form(None),
+    use_frag: bool = Form(False),
     time_limit: int = Form(360),
     webhook_url: str | None = None,
 ):
@@ -143,7 +147,7 @@ async def api(
         )
         final_path, stem = await asyncio.wait_for(
             asyncio.to_thread(compile_convert, PROJECTS_DIR / hash, OUTPUT_DIR / hash, CONVERTED_OUTPUT_DIR /
-                              hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, Path(compile_folder), tex_paths, tools, compiles, format, format_image, dpi, bg_color, raster_plasma, invert),
+                              hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, Path(compile_folder), tex_paths, tools, compiles, format, format_image, dpi, bg_color, raster_plasma, invert, frag_path, use_frag),
             timeout=clamp(time_limit, 0, 360)
         )
     except asyncio.TimeoutError as e:

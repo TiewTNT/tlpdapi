@@ -1,52 +1,44 @@
 from pathlib import Path
 import moderngl
-from PIL import Image
 import numpy as np
+from PIL import Image
 
-def generate_frag(frag_path: str | Path, output_path: str | Path, width: int, height: int):
-    # Create headless context (no display needed)
+def generate_frag(frag_path, out_path, width, height):
     ctx = moderngl.create_standalone_context()
+    prog = ctx.program(
+        vertex_shader='''
+            #version 330
+            in vec2 in_vert;
+            out vec2 uv;
+            void main() {
+                uv = in_vert * 0.5 + 0.5;
+                gl_Position = vec4(in_vert, 0.0, 1.0);
+            }
+        ''',
+        fragment_shader=open(frag_path).read()
+    )
 
-    # Vertex shader (passes through positions)
-    vertex_shader = '''
-    #version 330
-    in vec2 in_vert;
-    out vec2 uv;
-    void main() {
-        uv = in_vert * 0.5 + 0.5;
-        gl_Position = vec4(in_vert, 0.0, 1.0);
-    }
-    '''
+    prog['iResolution'].value = (width, height)
 
-    # Fragment shader
-    with open(frag_path, 'r') as f:
-        fragment_shader = f.read()
-
-    # Compile shaders
-    prog = ctx.program(vertex_shader=vertex_shader, fragment_shader=fragment_shader)
-
-    # Create quad
-    vertices = np.array([
+    quad = np.array([
         -1.0, -1.0,
-        1.0, -1.0,
+         1.0, -1.0,
         -1.0,  1.0,
-        1.0,  1.0,
+        -1.0,  1.0,
+         1.0, -1.0,
+         1.0,  1.0,
     ], dtype='f4')
 
-    vbo = ctx.buffer(vertices)
+    vbo = ctx.buffer(quad.tobytes())
     vao = ctx.simple_vertex_array(prog, vbo, 'in_vert')
 
-    # Render to framebuffer
     fbo = ctx.simple_framebuffer((width, height))
     fbo.use()
-    vao.render(moderngl.TRIANGLE_STRIP)
+    fbo.clear(0.0, 0.0, 0.0, 1.0)
+    vao.render()
 
-    # Read pixels
-    data = fbo.read(components=3)
-    img = Image.frombytes('RGB', (width, height), data)
-    img = img.transpose(Image.FLIP_TOP_BOTTOM)
-    img.save(str(output_path))
-    print("Saved to shader_output.png")
+    img = Image.frombytes('RGB', fbo.size, fbo.read(components=3))
+    img.save(out_path)
 
 
 def safe(path: Path, base: Path):

@@ -41,17 +41,14 @@ def compile(file_folder: Path,
         output_folder = output_root / compile_folder.relative_to(compile_folder.anchor)
         print('COMPILE CWD', output_folder, 'SAFE')
 
-    tex_exists = False
-    tex_trimmed = tex_paths
-    for tex_path in tex_trimmed:
-        print('CHECKING IF PATH',tex_path,'EXISTS')
-        if (output_root / tex_path.relative_to(tex_path.anchor)).exists():
-            tex_exists = True
-            tex_path = output_root / tex_path.relative_to(tex_path.anchor)
-        else:
-            tex_trimmed.remove(tex_path)
+    validated_tex_paths = []
+    for tex_path in tex_paths:
+        print('CHECKING IF PATH', tex_path, 'EXISTS')
+        full_path = output_root / tex_path.relative_to(tex_path.anchor)
+        if full_path.exists():
+            validated_tex_paths.append(full_path)
 
-    text_paths = tex_trimmed
+    tex_paths = validated_tex_paths
 
     pdf_paths = []
 

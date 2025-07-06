@@ -24,6 +24,21 @@
   let bg_color = $state({ r: 255, g: 255, b: 255, a: 1 });
   let picker = $state();
 
+  const dropzone = document.getElementById("file_select");
+
+
+onMount(() => {
+  const dropzone = document.getElementById("file_select");
+  if (!dropzone) return;
+
+  dropzone.addEventListener("dragover", e => e.preventDefault());
+
+  dropzone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    const dropped_files = Array.from(e.dataTransfer.files);
+    files = [...files, ...dropped_files];
+  });
+});
   function handleColorChange(e) {
     bg_color = e.detail.value;
   }
@@ -106,7 +121,7 @@
 <!-- Markup -->
 <label class="advanced">
   {#if !advanced}
-    <span style="background-color: var(--element-bg);"></span>
+    <span style="background-color: var(--element-bg);"><img src="/empty_checkbox.svg" alt="Unchecked" /></span>
   {:else}
     <span style="background-color: var(--primary-color);">
       <img src="/check.svg" alt="Checked" />
@@ -117,17 +132,18 @@
 
 <div class="centered-div">
   <img src="/txcpapi.svg" class="txcpapi" alt="TXCPAPI" />
-
-  <label class="custom-file-label"
+  <span id="file_select">
+  <label class="custom-file-label" 
     >Select Files
     <input
       id="fileUpload"
       type="file"
       multiple
       style="display:none"
-      on:change={handleFiles}
+      onchange={handleFiles}
     />
   </label>
+</span>
 
   {#if files.length}
     <ul class="box">
@@ -171,8 +187,8 @@
           class="bg-picker"
           bind:this={picker}
           color={bg_color}
-          on:color-changed={handleColorChange}
-        />
+          oncolor-changed={handleColorChange}
+        ></rgba-color-picker>
       {/if}
       <label class="checkbox">
         {#if !raster_plasma}
@@ -200,11 +216,7 @@
             <img src="/check.svg" alt="Checked" />
           </span>
         {/if}
-        <input
-          type="checkbox"
-          style="display:none"
-          bind:checked={invert}
-        /> Invert
+        <input type="checkbox" style="display:none" bind:checked={invert} /> Invert
       </label>
     {/if}
   {/if}
@@ -223,10 +235,10 @@
   {/if}
 
   {#if advanced}
-    <input type="text" placeholder="Compile path" bind:value={compile_path}/>
+    <input type="text" placeholder="Compile path" bind:value={compile_path} />
   {/if}
 
-  <button name="compile_button" on:click={submit}>
+  <button name="compile_button" onclick={submit}>
     {#if loading}
       <img src="/loading.svg" alt="Loading..." />
     {:else}
