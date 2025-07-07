@@ -127,7 +127,7 @@ async def api(
     os.makedirs(OUTPUT_DIR / hash, exist_ok=True)
     bg_color = json.loads(bg_color)
 
-    # background_tasks.add_task(cleanup, hash)
+    background_tasks.add_task(cleanup, hash)
     try:
         size = 0
         size_limit = 33554432
@@ -139,12 +139,13 @@ async def api(
                     if not chunk:
                         break
                     size += len(chunk)
+                    if size > size_limit:
+                        return JSONResponse(
+                        status_code=413,
+                        content={"error": "File too large", "message": f"Uploads are limited to around {size_limit/(1024**2)}MB total."}
+                    )
                     f.write(chunk)
-        if size > size_limit:
-            return JSONResponse(
-            status_code=413,
-            content={"error": "File too large", "message": f"Uploads are limited to around {size_limit/(1024**2)}MB total."}
-        )
+        
         final_path, stem = await asyncio.wait_for(
             asyncio.to_thread(compile_convert, PROJECTS_DIR / hash, OUTPUT_DIR / hash, CONVERTED_OUTPUT_DIR /
                               hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, Path(compile_folder), tex_paths, tools, compiles, format, format_image, dpi, bg_color, raster_plasma, invert, frag_path, use_frag),
