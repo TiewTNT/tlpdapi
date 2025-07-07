@@ -37,7 +37,7 @@ def generate_frag(frag_path, out_path, width, height):
     fbo.clear(0.0, 0.0, 0.0, 1.0)
     vao.render()
 
-    img = Image.frombytes('RGB', fbo.size, fbo.read(components=3))
+    img = Image.frombytes('RGBA', fbo.size, fbo.read(components=3))
     img.save(out_path)
 
 

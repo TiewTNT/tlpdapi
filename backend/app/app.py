@@ -125,6 +125,7 @@ async def api(
     frag_path: str | Path | None = Form(None),
     use_frag: bool = Form(False),
     time_limit: int = Form(360),
+    verbose: bool = Form(False),
     webhook_url: str | None = None,
 ):
 
@@ -175,7 +176,7 @@ async def api(
                                       "status": "error during compile / convert", "code": 1})
 
         return JSONResponse(content={
-            "error": str(e)[:15],
+            "error": str(e) if verbose else str(e)[:15],
             "message": "Error during compile or conversion process."
         }, status_code=500)
 
