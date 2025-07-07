@@ -50,13 +50,20 @@ app.add_middleware(
 
 
 async def cleanup(hash):
-    try:
-        shutil.rmtree(PROJECTS_DIR / hash, ignore_errors=True)
-        shutil.rmtree(OUTPUT_DIR / hash, ignore_errors=True)
-        shutil.rmtree(CONVERTED_OUTPUT_DIR / hash, ignore_errors=True)
-        os.remove(ZIP_OUTPUT_DIR / (hash + '.zip'))
-    except Exception as e:
-        print('Cleanup failed: '+str(e))
+    remove_list = [PROJECTS_DIR / hash, OUTPUT_DIR / hash,
+                   CONVERTED_OUTPUT_DIR / hash, ZIP_OUTPUT_DIR / (hash + '.zip')]
+    for path in remove_list:
+        try:
+            if not isinstance(path, Path):
+                print(
+                    f"[CLEANUP] Invalid path type: {path} (type={type(path)})")
+                continue
+            if path.is_dir():
+                shutil.rmtree(path, ignore_errors=True)
+            else:
+                path.unlink(missing_ok=True)
+        except Exception as e:
+            print('[CLEANUP] Cleanup failed: '+str(e))
     return
 
 
@@ -141,11 +148,12 @@ async def api(
                     size += len(chunk)
                     if size > size_limit:
                         return JSONResponse(
-                        status_code=413,
-                        content={"error": "File too large", "message": f"Uploads are limited to around {size_limit/(1024**2)}MB total."}
-                    )
+                            status_code=413,
+                            content={
+                                "error": "File too large", "message": f"Uploads are limited to around {size_limit/(1024**2)}MB total."}
+                        )
                     f.write(chunk)
-        
+
         final_path, stem = await asyncio.wait_for(
             asyncio.to_thread(compile_convert, PROJECTS_DIR / hash, OUTPUT_DIR / hash, CONVERTED_OUTPUT_DIR /
                               hash, ZIP_OUTPUT_DIR, engine, macro, compile_tool, Path(compile_folder), tex_paths, tools, compiles, format, format_image, dpi, bg_color, raster_plasma, invert, frag_path, use_frag),
@@ -165,7 +173,7 @@ async def api(
         if webhook_url:
             background_tasks.add_task(send_webhook, webhook_url, {
                                       "status": "error during compile / convert", "code": 1})
-        
+
         return JSONResponse(content={
             "error": str(e)[:15],
             "message": "Error during compile or conversion process."
@@ -184,13 +192,14 @@ async def api(
         if webhook_url:
             background_tasks.add_task(send_webhook, webhook_url, {
                                       "status": "success", "code": 0})
-            
+
         print('HASH:', hash)
         return FileResponse(
             final_path,
             media_type=mime_types.get(
                 final_path.suffix[1:], 'application/octet-stream'),
-            filename=secure_filename(download_name) if download_name else secure_filename(stem + (final_path.suffix))
+            filename=secure_filename(download_name) if download_name else secure_filename(
+                stem + (final_path.suffix))
         )
 
 app.mount("/", StaticFiles(directory=FRONTEND /
